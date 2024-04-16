@@ -106,10 +106,14 @@ class tomlparser():
             return(self.identifytest(action, self.t_identify_all))
 
         def texttest(self, action: dict) -> tuple:
+            temp=sum(int(key in action.keys()) for key in self.t_choice_text)
+            valuetype=[None]
             #Its valid to not include any text choice, in this situation we will prompt them OTF
-            if 1 > sum(int(key in action.keys()) for key in self.t_choice_text):
+            if 1 < temp:
                 raise ValueError("You cannot use multiple methods of defining value for a text field")
-            valuetype=[str(TheKey) for TheKey in action if TheKey in self.t_choice_text]
+            #in case they include a value aka mode for the password
+            elif 1 == temp:
+                valuetype=[str(TheKey) for TheKey in action if TheKey in self.t_choice_text]
             #idtype, valuetype
             return(self.identifytest(action, self.t_identify_all), valuetype[0])
             
@@ -125,7 +129,15 @@ class tomlparser():
         vParent=['NETWORK', 'ACTION']
         #reads from a toml file
         with open(self.filepath, "rb") as stream:
-            tml=toml.load(stream)
+            try:
+                tml=toml.load(stream)
+            except UnicodeDecodeError:
+                raise UnicodeDecodeError("Your TOML File Appears to be corrupted or your pointing to the wrong file")
+            except toml.TOMLDecodeError:
+                raise toml.TOMLDecodeError("Your TOML File Appears to have Formatting Error")
+            except FileNotFoundError:
+                raise FileNotFoundError("Cannot Find the File, Ensure the file path is correct and the file exits")
+
         #checks if the TOML file contains the two main Dictionaries 
         if all(x in vParent for x in tml):
             net=tml['NETWORK']
@@ -138,21 +150,22 @@ class tomlparser():
                 match action["action"]:
                     case 'wait':
                         wait=v.waittest(action)
-                        toDo.append(self.Action('wait', {'wait', wait}))
+                        #creates action object, because its type wait cannot have an id-type 
+                        toDo.append(self.Action(type='wait', value={'wait' : wait}))
                     case 'text':
                         tp=v.texttest(action)
                         idtype=tp[0]
                         valuetype=tp[1]
-                        #creates action object and adds it to the list
-                        toDo.append(self.Action('text', {idtype, action[idtype]}, {valuetype, action[valuetype]}))
+                        #creates action object and adds it to the list, The value can be None, when the user wants to be prompted for the password
+                        toDo.append(self.Action('text', {idtype : action[idtype]}, value={valuetype : action[valuetype]} if valuetype!=None else None))
                     case 'click':
                         idtype=v.clicktest(action)
                         #creates action object and adds it to the list
-                        toDo.append(self.Action('click', {idtype, action[idtype]}))
+                        toDo.append(self.Action('click', {idtype : action[idtype]}))
                     case 'move':
                         idtype=v.movetest(action)
                         #creates action object and adds it to the list
-                        toDo.append(self.Action('move', {idtype, action[idtype]}))
+                        toDo.append(self.Action('move', {idtype : action[idtype]}))
                     case _:
                         raise ValueError(f"missing And/or invalid action in action#{place}")
             return(net, toDo)
@@ -173,4 +186,3 @@ class tomlparser():
 
 v=tomlparser(r"EXAMPLE.toml")
 v.print()
-

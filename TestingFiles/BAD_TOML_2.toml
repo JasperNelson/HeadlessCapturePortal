@@ -1,4 +1,4 @@
-[NETWORK]
+NETWORK]
 #if set, will cause an error to occur if the SSID does not match 
 SSID="examplewifi" 
 #overrides the default starting URL for the capture portal. 
@@ -6,7 +6,7 @@ URL="https://example.com" #IMPORTANT: Additionally this is (needed for keyring f
 #IP address of the Capture Portal 
 IP="1.0.0.1"
 
-[[ACTION]] #ID is unique
+[[ACTION] #ID is unique
 action="click"
 id="example" #ID supports regular expressions
 
