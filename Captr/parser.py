@@ -5,7 +5,7 @@ from typing import Optional
 from pprint import pprint
 
 #defines the values that can be present in a 
-class tomlparser():
+class toml_parser():
     """
     TOML file parser that translates the content into structured Python variables and objects.
 
@@ -184,5 +184,5 @@ class tomlparser():
         '''prints the ingested data'''
         pprint(self.ingest)
 
-v=tomlparser(r"EXAMPLE.toml")
+v=toml_parser(r"EXAMPLE.toml")
 v.print()
