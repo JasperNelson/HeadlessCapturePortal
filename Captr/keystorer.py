@@ -4,7 +4,7 @@ import bitwarden_keyring #bitwarden backend for keyring
 import re #regex module 
 from getpass import getpass as gp
 from dataclasses import dataclass #module for dataclasses
-from colorama import init, Fore, Back, Style
+from colorama import init, Fore
 
 
 class key_manager():
@@ -16,25 +16,29 @@ class key_manager():
   "libsecret":libsecret.Keyring, #for GNOME on linux
   "bitwarden":bitwarden_keyring #for Bitwarden
   }
-  def __init__(self, URL: str, username: str, keyringService: str):
+  def __init__(self, URL: str, username: str, keyringBackend: str):
     init(autoreset=False)
-    if keyringService != None: #if none it means the user is going with the default keyring selection
+    if keyringBackend != None: #if none it means the user is going with the default keyring selection
       try:
-        self.keyringService=self.keyring_backends[keyringService]
-        ky.set_keyring(self.keyringService()) #manual keyring backend selection
+        self.userKeyringBackend=keyringBackend
+        self.keyringBackend=self.keyring_backends[keyringBackend]
+        ky.set_keyring(self.keyringBackend()) #manual keyring backend selection
       except KeyError:
-        print(Fore.RED+f"The backend specified for your keyring ({keyringService}) is not a valid or supported backend string")
-        raise ValueError 
+        error=f"The backend specified for your keyring ({keyringBackend}) is not a valid or supported backend string"
+        raise KeyError(error) #wrong value for the service
     self.URL=URL
     self.username=username
     
     
   #checks if the key exists in the Users keyring
   def _key_exists(self) ->bool:
-    if None == (ky.get_password(f"HLessCapturePortal_{self.URL}", self.username)):
-        return(False)
-    return(True)
-  
+    try:
+      if None == (ky.get_password(f"HLessCapturePortal_{self.URL}", self.username)):
+          return(False)
+      return(True)
+    except NameError: 
+       error=f"The backend specified for your keyring ({self.userKeyringBackend}) is not accessible or installed"
+       raise NameError(error) 
   #temporary prompt to ask the user for their password
   def _tmp_prompt(self) ->str:
     while(True):
@@ -60,5 +64,7 @@ class key_manager():
     else:
       return(self._key_add())
 
-x= key_manager(URL="https://example.com",username="jhasdlltest", keyringService="secretservice")
+
+#example implementation
+x= key_manager(URL="https://example.com",username="jhasdlltest", keyringBackend="windows")
 print(x.key_access())
