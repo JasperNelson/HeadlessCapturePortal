@@ -45,11 +45,12 @@ class key_manager():
         return(first)
     
   #adds a key to the keyring
-  def _key_add(self):
+  def _key_add(self) ->str:
      psword=self._tmp_prompt()
      ky.set_password(f"HLessCapturePortal_{self.URL}", self.username, psword)
      if None==ky.get_password(f"HLessCapturePortal_{self.URL}", self.username): #Warning for the user if the keyring did not save the key
        print(Fore.YELLOW+"Warning: Something is wrong with your keyring, the password wasnt properly saved")
+     return psword
 
   #access the keyring if they exist
   def key_access(self):
@@ -58,5 +59,5 @@ class key_manager():
     else:
       return(self._key_add())
 
-x= key_manager(URL="https://example.com",username="jhasdlltest", keyringService="something")
+x= key_manager(URL="https://example.com",username="jhasdlltest", keyringService="secretservice")
 print(x.key_access())
