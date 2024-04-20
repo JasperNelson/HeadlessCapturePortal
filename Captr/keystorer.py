@@ -8,7 +8,7 @@ from colorama import init, Fore, Back, Style
 
 
 class key_manager():
-  keyring_backends={
+  keyring_backends={ #list of supported keyring backends
   "secretservice":SecretService.Keyring, #for both Kwallet on KDE and libsecret in GNOME
   "kwallet":kwallet.DBusKeyring, #for Kwallet on KDE
   "windows":Windows.WinVaultKeyring, #for Windows Vault keys
@@ -18,9 +18,10 @@ class key_manager():
   }
   def __init__(self, URL: str, username: str, keyringService: str):
     init(autoreset=False)
-    if keyringService != None:
+    if keyringService != None: #if none it means the user is going with the default keyring selection
       try:
         self.keyringService=self.keyring_backends[keyringService]
+        ky.set_keyring(self.keyringService()) #manual keyring backend selection
       except KeyError:
         print(Fore.RED+f"The backend specified for your keyring ({keyringService}) is not a valid or supported backend string")
         raise ValueError 
