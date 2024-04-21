@@ -1,7 +1,7 @@
 #Parses TOML files into digestible python variables and objects
 import tomllib as toml
 from dataclasses import dataclass
-from typing import Optional
+from typing import Optional, Tuple, Any, Callable
 from pprint import pprint
 
 #defines the values that can be present in a 
@@ -30,8 +30,6 @@ class toml_parser():
         Updates the filepath of the TOML file to parse and re-invokes parsing.
     ingest():
         returns the ingested TOML datastructure. 
-    print()
-        Prints the parsed TOML content in a formatted manner using pprint for readability.
 
     Raises
     ------
@@ -44,11 +42,23 @@ class toml_parser():
     >>> parser.print()
     Prints parsed data from the 'config.toml' file.
     """
-    def __init__(self, filepath: str=""):
+    def __init__(self, filepath: str="") -> None:
         self.filepath = str(filepath)
-        self.ingest=self._tomlparse()        
+        self.ingest=tuple(self._tomlparse())    
+
+    def __str__(self) -> str:
+       return(
+        f"the Network Portion of the file is a dictionary containing the following: \n {self.ingest[0]} \n" 
+        f"the Actions listed in the file are as follows: \n {self.ingest[1]}"
+       )
+         
+    def __repr__(self) -> str:
+        return(
+        f"Network:{self.ingest[0]}, Actions{self.ingest[1]}"
+        )
 
     #defines the new type of object that we will be setting every instance of ACTION to
+   
     @dataclass
     class Action():
         """
@@ -74,7 +84,7 @@ class toml_parser():
         """
         helper class used internally by tomlparseer to validate and process the actions specified in the toml file
         """
-        def __init__(self):
+        def __init__(self) -> None:
             """
             contains the crucial and valid expressions for the TOML file used as a refrence for errors
             """
@@ -107,15 +117,16 @@ class toml_parser():
 
         def texttest(self, action: dict) -> tuple:
             temp=sum(int(key in action.keys()) for key in self.t_choice_text)
-            valuetype=[None]
+            valuetype=None
             #Its valid to not include any text choice, in this situation we will prompt them OTF
             if 1 < temp:
                 raise ValueError("You cannot use multiple methods of defining value for a text field")
             #in case they include a value aka mode for the password
+            #NOTE: could be implemented better right now its doing unnecessary compute
             elif 1 == temp:
-                valuetype=[str(TheKey) for TheKey in action if TheKey in self.t_choice_text]
+                valuetype=[str(TheKey) for TheKey in action if TheKey in self.t_choice_text][0]
             #idtype, valuetype
-            return(self.identifytest(action, self.t_identify_all), valuetype[0])
+            return(self.identifytest(action, self.t_identify_all), valuetype)
             
         def movetest(self, action: dict) -> str:
             return(self.identifytest(action, self.t_identify_move))
@@ -131,8 +142,9 @@ class toml_parser():
         with open(self.filepath, "rb") as stream:
             try:
                 tml=toml.load(stream)
-            except UnicodeDecodeError:
-                raise UnicodeDecodeError("Your TOML File Appears to be corrupted or your pointing to the wrong file")
+            except UnicodeDecodeError as err:
+                print("ERROR: Your TOML File Appears to be corrupted or your pointing to the wrong file")
+                raise err
             except toml.TOMLDecodeError:
                 raise toml.TOMLDecodeError("Your TOML File Appears to have Formatting Error")
             except FileNotFoundError:
@@ -172,17 +184,18 @@ class toml_parser():
         else:
             raise ValueError("Error, your either missing NETWORK or ACTION from your CONFIG")
     
-    def changeconfigfile(self,filepath: int=""):
+    def changeconfigfile(self,filepath: str="") -> None:
+        """
+        Changes the path of the set config file to the new path supplied AND parses it
+        """
         self.filepath=filepath
         self.ingest=self._tomlparse()
 
-    def ingest(self):
-        '''returns the ingested data'''
-        return self.ingest
-
-    def print(self):
-        '''prints the ingested data'''
-        pprint(self.ingest)
+    def result(self) -> tuple:
+        '''
+        returns the ingested data
+        '''
+        return tuple(self.ingest)
 
 v=toml_parser(r"EXAMPLE.toml")
-v.print()
+print(v.result())

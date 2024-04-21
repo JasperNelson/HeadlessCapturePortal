@@ -16,6 +16,7 @@ class key_manager():
   "libsecret":libsecret.Keyring, #for GNOME on linux
   "bitwarden":bitwarden_keyring #for Bitwarden
   }
+
   def __init__(self, URL: str, username: str, keyringBackend: str):
     init(autoreset=False)
     if keyringBackend != None: #if none it means the user is going with the default keyring selection
@@ -58,7 +59,7 @@ class key_manager():
      return psword
 
   #access the keyring if they exist
-  def key_access(self):
+  def key_access(self)->str:
     if self._key_exists():
       return (ky.get_password(f"HLessCapturePortal_{self.URL}", self.username))
     else:
