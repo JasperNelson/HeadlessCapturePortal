@@ -1,3 +1,4 @@
 colorama
 bitwarden-keyring
 typing
+pytest
