@@ -20,4 +20,5 @@
             conda create -n captrportal
             conda activate captrportal
             conda install python
+            pip install -r requirements.txt
             ```
