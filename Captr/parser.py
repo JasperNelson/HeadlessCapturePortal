@@ -1,29 +1,27 @@
 #Parses TOML files into digestible python variables and objects
 import tomllib as toml
-from dataclasses import dataclass
-from typing import Optional, Tuple, Any, Callable
-from pprint import pprint
+from typing import Optional, NamedTuple, Type, Any
 
-#defines the values that can be present in a 
-class toml_parser():
+class TOMLparser():
     """
-    TOML file parser that translates the content into structured Python variables and objects.
+    TOML file parser that translates the content of a login-file into a easily digestible NamedTuple 
+    This parser is specifically designed to interpret TOML files used for configuration into actionable objects based on the  
+    'NETWORK' and 'ACTION' fields as meets our specification in the readme. 
 
-    This parser is specifically designed to interpret TOML files used for configuration into actionable objects based on 
-    'NETWORK' and 'ACTION'. 
     - Validates and processes various types of actions ('wait', 'text', 'click', 'move') as defined in the TOML file. (see EXAMPLE.toml)
 
     Attributes
     ----------
     filepath : str
         The file path of the TOML file to be parsed. Needs to be set during instantiation
-    ingest : tuple
-        Contains parsed data from the TOML file, including network configurations and a list of action objects. In the format
-        (dict('NETWORK'),list(ACTION, ACTION, ACTION, ACTION))
+    ingest : NamedTuple
+        Refrences and starts the process of ingesting the given file
+    export : NamedTuple
+        Saved version of the result from the last time running the ingest. 
 
     Methods
     -------
-    tomlparse() -> tuple
+    tomlparse() -> Ingest(named Tuple)
         Parses the TOML file, validates its structure, and creates a tuple containing network details
         and a list of Actions based on the 'ACTION' section of the TOML file.
     changeconfigfile(filepath: str)
@@ -38,29 +36,12 @@ class toml_parser():
 
     Examples
     --------
-    >>> parser = tomlparser("config.toml")
+    >>> parser = tomlparser("login.toml")
     >>> parser.print()
-    Prints parsed data from the 'config.toml' file.
+    Prints parsed data from the 'login.toml' file.
     """
-    def __init__(self, filepath: str="") -> None:
-        self.filepath = str(filepath)
-        self.ingest=tuple(self._tomlparse())    
-
-    def __str__(self) -> str:
-       return(
-        f"the Network Portion of the file is a dictionary containing the following: \n {self.ingest[0]} \n" 
-        f"the Actions listed in the file are as follows: \n {self.ingest[1]}"
-       )
-         
-    def __repr__(self) -> str:
-        return(
-        f"Network:{self.ingest[0]}, Actions{self.ingest[1]}"
-        )
-
-    #defines the new type of object that we will be setting every instance of ACTION to
-   
-    @dataclass
-    class Action():
+    
+    class Action(NamedTuple):
         """
         A data structure representing an action to be performed, parsed from the TOML file.
 
@@ -79,7 +60,35 @@ class toml_parser():
         id: Optional[dict] = None
         #value is only used by text actions
         value: Optional[dict] = None
+ 
+    class Ingest(NamedTuple):
+        """
+        Definition of the NamedTuple that is used in the packaging of the data that was ingested. 
+        """
+        Network: dict
+        Actions: list["TOMLparser.Action"] #forward reference
 
+
+
+    def __init__(self, filepath: str="") -> None:
+        self.filepath = str(filepath)
+        self.export = Optional[Any]
+        self.ingest=self._tomlparse()
+    
+    def __str__(self) -> str:
+       return(
+        f"the Network Portion of the file is a dictionary containing the following: \n {self.ingest[0]} \n" 
+        f"the Actions listed in the file are as follows: \n {self.ingest[1]}"
+       )
+         
+    def __repr__(self) -> str:
+        return(
+        f"Network:{self.ingest[0]}, Actions{self.ingest[1]}"
+        )
+
+
+
+    #defines the new type of object that we will be setting every instance of ACTION to\    
     class _var_test(): 
         """
         helper class used internally by tomlparseer to validate and process the actions specified in the toml file
@@ -180,7 +189,8 @@ class toml_parser():
                         toDo.append(self.Action('move', {idtype : action[idtype]}))
                     case _:
                         raise ValueError(f"missing And/or invalid action in action#{place}")
-            return(net, toDo)
+            self.export=self.Ingest(Network=net, Actions=toDo)
+            return self.export 
         else:
             raise ValueError("Error, your either missing NETWORK or ACTION from your CONFIG")
     
@@ -191,11 +201,11 @@ class toml_parser():
         self.filepath=filepath
         self.ingest=self._tomlparse()
 
-    def result(self) -> tuple:
+    def result(self) -> object:
         '''
-        returns the ingested data
+        returns the ingested data. 
         '''
-        return tuple(self.ingest)
+        return self.export
 
-v=toml_parser(r"EXAMPLE.toml")
+v=TOMLparser(r"EXAMPLE.toml")
 print(v.result())
