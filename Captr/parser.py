@@ -1,6 +1,37 @@
 #Parses TOML files into digestible python variables and objects
 import tomllib as toml
-from typing import Optional, NamedTuple, Type, Any
+from typing import Optional, NamedTuple, Any
+
+#Singleton Only one config can exist
+class Config():
+    _instance = None
+    def __new__(cls):
+        if cls._instance is None:
+            cls._instance= super(Config, cls).__new__(cls)
+    
+
+
+class Action(NamedTuple):
+    """
+    A data structure representing an action to be performed in Login Files Used by TOMLparser, 
+
+    Attributes
+    ----------
+    type : str
+        The type of action (e.g., 'wait', 'text', 'click', 'move').
+    id : dict, optional
+        The identifiers for the action, relevant for all types except 'wait'.
+    value : dict, optional
+        The values associated with the action, used for all wait and text actions.
+    """
+    #type of action
+    type: str
+    #value is not used by wait actions
+    id: Optional[dict] = None
+    #value is only used by text actions
+    value: Optional[dict] = None
+
+
 
 class TOMLparser():
     """
@@ -23,47 +54,34 @@ class TOMLparser():
     -------
     tomlparse() -> Ingest(named Tuple)
         Parses the TOML file, validates its structure, and creates a tuple containing network details
-        and a list of Actions based on the 'ACTION' section of the TOML file.
+        and a list of Actions based on the 'ACTION' section of the TOML Login file.
     changeconfigfile(filepath: str)
         Updates the filepath of the TOML file to parse and re-invokes parsing.
     ingest():
         returns the ingested TOML datastructure. 
 
-    Raises
+    Possible Raises
     ------
     ValueError
-        If the TOML file does not contain the required sections or contains bad data. 
+        If the TOML file does not contain proper Login-File formatting. 
+    TOMLDecodeError 
+        If the TOML file has invalid TOML formatting (not to be confused with login formatting)
+    FileNotFoundError
+        If the File given does not exist or cannot be found.
+    UnicodeDecodeError
+        If the File given is badly corrupted or the wrong filetype. 
 
     Examples
     --------
     >>> parser = tomlparser("login.toml")
-    >>> parser.print()
+    >>> parser.export
     Prints parsed data from the 'login.toml' file.
     """
-    
-    class Action(NamedTuple):
-        """
-        A data structure representing an action to be performed, parsed from the TOML file.
 
-        Attributes
-        ----------
-        type : str
-            The type of action (e.g., 'wait', 'text', 'click', 'move').
-        id : dict, optional
-            The identifiers for the action, relevant for all types except 'wait'.
-        value : dict, optional
-            The values associated with the action, used for all wait and text actions.
-        """
-        #type of action
-        type: str
-        #value is not used by wait actions
-        id: Optional[dict] = None
-        #value is only used by text actions
-        value: Optional[dict] = None
  
-    class Ingest(NamedTuple):
+    class LoginIngest(NamedTuple):
         """
-        Definition of the NamedTuple that is used in the packaging of the data that was ingested. 
+        Subclass of TOMLparser that defines a NamedTuple which is used for returning the value of the class
         """
         Network: dict
         Actions: list["TOMLparser.Action"] #forward reference
@@ -166,30 +184,31 @@ class TOMLparser():
             place=0 #tracks the place
             toDo=[]
             v=self._var_test()
+            # parses the actions and puts the values into action objects
             for action in actions:
                 place+=1
                 match action["action"]:
                     case 'wait':
                         wait=v.waittest(action)
                         #creates action object, because its type wait cannot have an id-type 
-                        toDo.append(self.Action(type='wait', value={'wait' : wait}))
+                        toDo.append(Action(type='wait', value={'wait' : wait}))
                     case 'text':
                         tp=v.texttest(action)
                         idtype=tp[0]
                         valuetype=tp[1]
                         #creates action object and adds it to the list, The value can be None, when the user wants to be prompted for the password
-                        toDo.append(self.Action('text', {idtype : action[idtype]}, value={valuetype : action[valuetype]} if valuetype!=None else None))
+                        toDo.append(Action('text', {idtype : action[idtype]}, value={valuetype : action[valuetype]} if valuetype!=None else None))
                     case 'click':
                         idtype=v.clicktest(action)
                         #creates action object and adds it to the list
-                        toDo.append(self.Action('click', {idtype : action[idtype]}))
+                        toDo.append(Action('click', {idtype : action[idtype]}))
                     case 'move':
                         idtype=v.movetest(action)
                         #creates action object and adds it to the list
-                        toDo.append(self.Action('move', {idtype : action[idtype]}))
+                        toDo.append(Action('move', {idtype : action[idtype]}))
                     case _:
                         raise ValueError(f"missing And/or invalid action in action#{place}")
-            self.export=self.Ingest(Network=net, Actions=toDo)
+            self.export=self.LoginIngest(Network=net, Actions=toDo)
             return self.export 
         else:
             raise ValueError("Error, your either missing NETWORK or ACTION from your CONFIG")
@@ -207,5 +226,5 @@ class TOMLparser():
         '''
         return self.export
 
-v=TOMLparser(r"EXAMPLE.toml")
-print(v.result())
+# v=TOMLparser(r"EXAMPLE.toml")
+# print(v.result())
