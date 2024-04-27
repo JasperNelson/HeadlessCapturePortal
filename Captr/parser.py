@@ -1,14 +1,65 @@
 #Parses TOML files into digestible python variables and objects
 import tomllib as toml
-from typing import Optional, NamedTuple, Any
+from typing import Optional, NamedTuple, Any, Type, TypeVar
+
+#reads toml files allows for setting the given directory of the aforementioned toml file as well
+def TOMLRead(directory: str) -> dict:
+    """
+    Simple function that Opens Toml Files saves them to a variable and then returns whats in them
+    """
+    with open(directory, "rb") as stream:
+            try:
+                tml=toml.load(stream)
+            except UnicodeDecodeError as err:
+                print("ERROR: Your TOML File Appears to be corrupted or your pointing to the wrong file")
+                raise err
+            except toml.TOMLDecodeError:
+                raise toml.TOMLDecodeError("Your TOML File Appears to have Formatting Errors")
+            except FileNotFoundError:
+                raise FileNotFoundError("Cannot Find the File, Ensure the file path is correct and the file exits")
+    return tml
+
+#TODO: Replace with the new syntax once supported by mypy
+T=TypeVar("T", bound="Config")#Manual Type needed for Singleton 
 
 #Singleton Only one config can exist
 class Config():
+    """
+    Creates a Singleton object for the config file as only one config file can exist. 
+    Returns the config as a dictionary.
+    """
     _instance = None
-    def __new__(cls):
+    
+    def __new__(cls: Type[T], filepath: str) -> T:
+        """Enforces the Singleton Design Pattern"""
         if cls._instance is None:
             cls._instance= super(Config, cls).__new__(cls)
+        return cls._instance
     
+    def __init__(self, filepath: str="") -> None:
+        self.filepath = str(filepath)
+        self.tml=self.ConfParse()
+
+    class Ingest(NamedTuple):
+        """
+        Subclass of Config that defines a NamedTuple which is used for returning the values for the config.
+        """
+        logging: bool
+        safetyPrompt: bool
+        loginFilesDir: str #forward reference
+
+    def ConfParse(self) -> Ingest:
+        """
+        Ingests the configuration file and stores the variables, it is then output as a Ingest Named tuple. 
+        """
+        ConfigVars=["LoginFilesDir", "PromptForSafety", "Logging"]
+        tml=TOMLRead(self.filepath)
+        if all(x in ConfigVars for x in tml):
+            self.tml= self.Ingest(logging=tml["Logging"], loginFilesDir=tml["LoginFilesDir"], safetyPrompt=tml["PromptForSafety"])
+            return(self.tml)
+        else:
+            raise ValueError("Error, your CONFIG is MALFORMED")
+            
 
 
 class Action(NamedTuple):
@@ -33,7 +84,7 @@ class Action(NamedTuple):
 
 
 
-class TOMLparser():
+class LOGINparser():
     """
     TOML file parser that translates the content of a login-file into a easily digestible NamedTuple 
     This parser is specifically designed to interpret TOML files used for configuration into actionable objects based on the  
@@ -79,19 +130,19 @@ class TOMLparser():
     """
 
  
-    class LoginIngest(NamedTuple):
+    class Ingest(NamedTuple):
         """
         Subclass of TOMLparser that defines a NamedTuple which is used for returning the value of the class
         """
         Network: dict
-        Actions: list["TOMLparser.Action"] #forward reference
+        Actions: list[Action] #forward reference
 
 
 
     def __init__(self, filepath: str="") -> None:
         self.filepath = str(filepath)
         self.export = Optional[Any]
-        self.ingest=self._tomlparse()
+        self.ingest=self._loginparse()
     
     def __str__(self) -> str:
        return(
@@ -159,24 +210,14 @@ class TOMLparser():
             return(self.identifytest(action, self.t_identify_move))
         
     #parses the toml from a file
-    def _tomlparse(self) -> tuple:
+    def _loginparse(self) -> tuple:
         """
-        Internal Method used to orchestrate the parsing of the toml file.
+        Internal Method used to orchestrate the parsing of the login file.
         """
         #Valid Parent Keys for the toml
         vParent=['NETWORK', 'ACTION']
         #reads from a toml file
-        with open(self.filepath, "rb") as stream:
-            try:
-                tml=toml.load(stream)
-            except UnicodeDecodeError as err:
-                print("ERROR: Your TOML File Appears to be corrupted or your pointing to the wrong file")
-                raise err
-            except toml.TOMLDecodeError:
-                raise toml.TOMLDecodeError("Your TOML File Appears to have Formatting Error")
-            except FileNotFoundError:
-                raise FileNotFoundError("Cannot Find the File, Ensure the file path is correct and the file exits")
-
+        tml=TOMLRead(self.filepath)
         #checks if the TOML file contains the two main Dictionaries 
         if all(x in vParent for x in tml):
             net=tml['NETWORK']
@@ -208,17 +249,17 @@ class TOMLparser():
                         toDo.append(Action('move', {idtype : action[idtype]}))
                     case _:
                         raise ValueError(f"missing And/or invalid action in action#{place}")
-            self.export=self.LoginIngest(Network=net, Actions=toDo)
+            self.export=self.Ingest(Network=net, Actions=toDo)
             return self.export 
         else:
-            raise ValueError("Error, your either missing NETWORK or ACTION from your CONFIG")
+            raise ValueError("Error, your either missing NETWORK or ACTION from your LoginFile")
     
     def changeconfigfile(self,filepath: str="") -> None:
         """
         Changes the path of the set config file to the new path supplied AND parses it
         """
         self.filepath=filepath
-        self.ingest=self._tomlparse()
+        self.ingest=self._loginparse()
 
     def result(self) -> object:
         '''
@@ -226,5 +267,7 @@ class TOMLparser():
         '''
         return self.export
 
-# v=TOMLparser(r"EXAMPLE.toml")
-# print(v.result())
+v=LOGINparser(r"EXAMPLE.toml")
+print(v.result())
+t=Config(r"exCONFIG.toml")
+print(t.tml)
