@@ -84,7 +84,7 @@ class Action(NamedTuple):
 
 
 
-class LOGINparser():
+class LoginParser():
     """
     TOML file parser that translates the content of a login-file into a easily digestible NamedTuple 
     This parser is specifically designed to interpret TOML files used for configuration into actionable objects based on the  
@@ -267,7 +267,7 @@ class LOGINparser():
         '''
         return self.export
 
-v=LOGINparser(r"EXAMPLE.toml")
+v=LoginParser(r"EXAMPLE.toml")
 print(v.result())
 t=Config(r"exCONFIG.toml")
 print(t.tml)
