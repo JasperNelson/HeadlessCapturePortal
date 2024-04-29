@@ -78,6 +78,7 @@
   - Keyring Configuration:
     - Supported backends include: SecretService, KWallet, Windows Vault, macOS Keyring, libsecret, and Bitwarden.
     - The format for keyring values is `[username, *keyring-service]`.
+        - \*\*Valid keyring-service name strings are `secretservice`, `kwallet`, `windows`, `macos`, `libsecret`, and `bitwarden`
     - During initialization, if `-R` is passed, it allows changing the set keyring password.
   - Example: `keyring=["YourUserName"]`
 
