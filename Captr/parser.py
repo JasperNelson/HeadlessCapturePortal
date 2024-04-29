@@ -74,6 +74,7 @@ class Action(NamedTuple):
         The identifiers for the action, relevant for all types except 'wait'.
     value : dict, optional
         The values associated with the action, used for all wait and text actions.
+        Including Keyring Activation and Storage type. 
     """
     #type of action
     type: str

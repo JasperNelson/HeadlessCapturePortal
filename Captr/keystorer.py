@@ -2,12 +2,13 @@ import keyring as ky #handles keyrings for us.
 from keyring.backends import Windows, SecretService, kwallet, macOS, libsecret 
 import bitwarden_keyring #bitwarden backend for keyring
 import re #regex module 
+from typing import cast
 from getpass import getpass as gp
 from dataclasses import dataclass #module for dataclasses
 from colorama import init, Fore
 
 
-class key_manager():
+class KeyManager():
   keyring_backends={ #list of supported keyring backends
   "secretservice":SecretService.Keyring, #for both Kwallet on KDE and libsecret in GNOME
   "kwallet":kwallet.DBusKeyring, #for Kwallet on KDE
@@ -61,11 +62,12 @@ class key_manager():
   #access the keyring if they exist
   def key_access(self)->str:
     if self._key_exists():
-      return (ky.get_password(f"HLessCapturePortal_{self.URL}", self.username))
+      #Can never return None given the configuration
+      return cast(str, ky.get_password(f"HLessCapturePortal_{self.URL}", self.username))
     else:
-      return(self._key_add())
+      return cast(str, self._key_add())
 
 
 #example implementation
-x= key_manager(URL="https://example.com",username="jhasdlltest", keyringBackend="windows")
+x= KeyManager(URL="https://example.com",username="jhasdlltest", keyringBackend="windows")
 print(x.key_access())
