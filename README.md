@@ -3,7 +3,7 @@
 !["TOML Capture Portal Diagram"](./images/TOML-Capture-Architecture.png)
 * Major Classes:
     * `WebLogin`: Attempts to log into captive portal given a set of settings and actions
-    * `SettingsAndActions`: Named tuple.
+    * `LoginParser.Ingest`: Named tuple.
         1. First Element: Dictionary of Settings
         2. Second Element: List of actions
     * `LoginParser`: Takes a toml file path, reads a toml file from the given path, and creates a Ingest NamedTuple containing settings and actions.

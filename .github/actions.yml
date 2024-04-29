@@ -1,0 +1,7 @@
+name: Capture-GithubActions
+on: [push]
+jobs: 
+  Capture-Minimal:
+    runs-on: ubuntu-latest
+    steps: 
+    - uses: actions/checkout
