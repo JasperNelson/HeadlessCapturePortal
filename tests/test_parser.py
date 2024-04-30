@@ -11,7 +11,7 @@ assert(str((LoginParser(r"EXAMPLE.toml")).result())=="Ingest(Network={'SSID': 'e
 
 
 #tests to see if the error checking is workin
-def  test_Bad_Login_Files():
+def  test_Bad_Login_Files() -> None:
     with pytest.raises(UnicodeDecodeError):
         LoginParser(r"./TestingFiles/CORRUPTED_TOML")
     with pytest.raises(ValueError):
