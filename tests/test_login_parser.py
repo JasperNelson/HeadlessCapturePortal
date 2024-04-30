@@ -43,6 +43,6 @@ x-path="/html/body/div[id=login]"
     assert(export.Network["URL"] == "https://example.com")
     assert(export.Network["IP"] == "1.0.0.1")
     assert(len(export.Actions) == 1)
-    if export.Actions[0].id != None:
+    if export.Actions[0].id is not None:
         assert(len(export.Actions[0].id.keys()) == 1)
         assert(export.Actions[0].id["x-path"] == "/html/body/div[id=login]")
