@@ -1,66 +1,7 @@
+from __future__ import annotations
 #Parses TOML files into digestible python variables and objects
-
-import tomllib as toml
-from typing import Optional, NamedTuple, Any, Type, TypeVar
-
-#reads toml files allows for setting the given directory of the aforementioned toml file as well
-def TOMLRead(directory: str) -> dict:
-    """
-    Simple function that Opens Toml Files saves them to a variable and then returns whats in them
-    """
-    with open(directory, "rb") as stream:
-            try:
-                tml=toml.load(stream)
-            except UnicodeDecodeError as err:
-                print("ERROR: Your TOML File Appears to be corrupted or your pointing to the wrong file")
-                raise err
-            except toml.TOMLDecodeError:
-                raise toml.TOMLDecodeError("Your TOML File Appears to have Formatting Errors")
-            except FileNotFoundError:
-                raise FileNotFoundError("Cannot Find the File, Ensure the file path is correct and the file exits")
-    return tml
-
-#TODO: Replace with the new syntax once supported by mypy
-T=TypeVar("T", bound="Config")#Manual Type needed for Singleton 
-
-#Singleton Only one config can exist
-class Config():
-    """
-    Creates a Singleton object for the config file as only one config file can exist. 
-    Returns the config as a dictionary.
-    """
-    _instance = None
-    
-    def __new__(cls: Type[T], filepath: str) -> T:
-        """Enforces the Singleton Design Pattern"""
-        if cls._instance is None:
-            cls._instance= super(Config, cls).__new__(cls)
-        return cls._instance
-    
-    def __init__(self, filepath: str="") -> None:
-        self.filepath = str(filepath)
-        self.tml=self.ConfParse()
-
-    class Ingest(NamedTuple):
-        """
-        Subclass of Config that defines a NamedTuple which is used for returning the values for the config.
-        """
-        logging: bool
-        safetyPrompt: bool
-        loginFilesDir: str #forward reference
-
-    def ConfParse(self) -> Ingest:
-        """
-        Ingests the configuration file and stores the variables, it is then output as a Ingest Named tuple. 
-        """
-        ConfigVars=["LoginFilesDir", "PromptForSafety", "Logging"]
-        tml=TOMLRead(self.filepath)
-        if all(x in ConfigVars for x in tml):
-            self.tml= self.Ingest(logging=tml["Logging"], loginFilesDir=tml["LoginFilesDir"], safetyPrompt=tml["PromptForSafety"])
-            return(self.tml)
-        else:
-            raise ValueError("Error, your CONFIG is MALFORMED")
-            
+from TOMLRead import TOMLRead
+from typing import Optional, NamedTuple, Any, Type, TypeVar, IO, cast
 
 
 class Action(NamedTuple):
@@ -80,11 +21,9 @@ class Action(NamedTuple):
     #type of action
     type: str
     #value is not used by wait actions
-    id: Optional[dict] = None
+    id: Optional[dict | None] = None  
     #value is only used by text actions
-    value: Optional[dict] = None
-
-
+    value: Optional[dict | None] = None
 
 class LoginParser():
     """
@@ -141,10 +80,22 @@ class LoginParser():
 
 
 
-    def __init__(self, filepath: str="") -> None:
-        self.filepath = str(filepath)
-        self.export = Optional[Any]
-        self.ingest=self._loginparse()
+    def __init__(self, filepath: IO[bytes] | str="") -> None:
+        """
+        Constructs a LoginParser object that parses the given input.
+
+        Arguments:
+        - filepath: Either a string that points to a TOML file or a Python file-like
+          such as what you can get from calling open(foo, "rb") or io.BytesIO().
+        """
+        self.filepath: IO[bytes] | str | None = None
+        if type(filepath) == str:
+            # Read the file from disk.
+            self.filepath = cast(str, filepath)
+        else:
+            self.filepath = cast(IO[bytes], filepath)    
+        self.export: LoginParser.Ingest
+        self.ingest = self._loginparse()
     
     def __str__(self) -> str:
        return(
@@ -271,5 +222,4 @@ class LoginParser():
 
 v=LoginParser(r"EXAMPLE.toml")
 print(v.result())
-t=Config(r"exCONFIG.toml")
-print(t.tml)
+
