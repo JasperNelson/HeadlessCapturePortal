@@ -18,9 +18,9 @@ class KeyManager():
   "bitwarden":bitwarden_keyring #for Bitwarden
   }
 
-  def __init__(self, URL: str, username: str, keyringBackend: str):
+  def __init__(self, URL: str, username: str, keyringBackend: str | None):
     init(autoreset=False)
-    if keyringBackend != None: #if none it means the user is going with the default keyring selection
+    if isinstance(keyringBackend, str): #if none it means the user is going with the default keyring selection
       try:
         self.userKeyringBackend=keyringBackend
         self.keyringBackend=self.keyring_backends[keyringBackend]

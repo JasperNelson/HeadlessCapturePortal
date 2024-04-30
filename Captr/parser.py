@@ -1,4 +1,5 @@
 #Parses TOML files into digestible python variables and objects
+
 import tomllib as toml
 from typing import Optional, NamedTuple, Any, Type, TypeVar
 
