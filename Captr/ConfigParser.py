@@ -1,5 +1,6 @@
 from TOMLRead import TOMLRead
 from typing import Optional, NamedTuple, Type, TypeVar, IO, cast, Generic, Type, ClassVar
+import os
 
 #reads toml files allows for setting the given directory of the aforementioned toml file as well
 #TODO: Replace with the new syntax once supported by mypy
@@ -9,7 +10,8 @@ from typing import Optional, NamedTuple, Type, TypeVar, IO, cast, Generic, Type,
 class Config():
     """
     Creates a Singleton object for the config file as only one config file can exist. 
-    Returns the config as a dictionary.
+    Returns the config as a dictionary. Takes a string as the location of the config file 
+    Unless if the environment variable CAPTURE_CONFIG is set in which it is manually overrided to such. 
     """
     _instance: 'Config' | None = None
     
@@ -20,7 +22,10 @@ class Config():
         return cls._instance
     
     def __init__(self, filepath: str="") -> None:
-        self.filepath = str(filepath)
+        if os.environ.get("CAPTURE_CONFIG") != None:
+            self.filepath=os.environ.get("CAPTURE_CONFIG")
+        else:
+            self.filepath = str(filepath)
         self.tml=self.ConfParse()
 
     class Ingest(NamedTuple):
