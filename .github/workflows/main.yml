@@ -11,7 +11,7 @@ jobs:
     - name: CD build
       run: docker buildx build -t dockerarch -f .github/Dockerfile .
     - name: Create Container
-      run: cd .github && docker create --name dockerarch Dockerfile
+      run: cd .github && docker create --name dockerarch dockerarch
     - name: Copy Working Directory to Container
       run: docker cp . dockerarch:/.
     - name: Start Docker Image 
