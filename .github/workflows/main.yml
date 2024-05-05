@@ -1,0 +1,17 @@
+name: Capture-GithubActions-Testing
+on: [push]
+jobs: 
+  Capture-Minimal:
+    runs-on: ubuntu-latest
+    steps: 
+    - uses: actions/checkout@v4
+    - uses: actions/setup-python@v5
+    - name: BuildDockerImage
+      run: docker build -t  .
+    - name: Create Container
+      run: docker create --name dockerarch Dockerfile
+    - name: Copy Working Directory to Container
+      run: docker cp . dockerarch:/.
+    - name: Start Docker Image 
+      run: docker start dockerarch
+   
