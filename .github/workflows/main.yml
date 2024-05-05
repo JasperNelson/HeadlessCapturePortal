@@ -9,7 +9,7 @@ jobs:
       with: 
         python-version: '3.12.2'
     - name: CD build
-      run: cd .github && docker buildx build -t dockerarch -f .github .
+      run: docker buildx build -t dockerarch -f .github .
     - name: Create Container
       run: cd .github && docker create --name dockerarch Dockerfile
     - name: Copy Working Directory to Container
