@@ -1,0 +1,5 @@
+colorama
+bitwarden-keyring
+typing
+mypy
+pytest
