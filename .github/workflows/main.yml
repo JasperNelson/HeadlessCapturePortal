@@ -13,9 +13,7 @@ jobs:
     - name: Create Container
       run: cd .github && docker create --name dockerarch dockerarch
     - name: Copy Working Directory to Container
-      run: docker cp . dockerarch:/.
-    - name: Start Docker Image 
-      run: docker start dockerarch
-    - name: Docker Simple Pytest
-      run: docker exec -i dockerarch pytest 
+      run: docker cp . dockerarch:/.   
+    - name: Docker Simple Pytest 
+      run: docker start dockerarch && docker exec -i dockerarch pytest 
    
