@@ -1,5 +1,5 @@
 FROM archlinux:latest
-RUN pacman -Syu --noconfirm \
+RUN pacman -Syu --noconfirm \780
     && pacman -S git base-devel --noconfirm \
     && pacman -Scc --noconfirm
 RUN pacman -S python --noconfirm 
@@ -18,6 +18,7 @@ COPY . /app
 RUN pip install -r requirements.txt 
 RUN dbus-run-session -- sh 
 RUN echo 'creds' | gnome-keyring-daemon
+CMD pytest
 
 
 
