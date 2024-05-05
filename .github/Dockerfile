@@ -1,5 +1,5 @@
 FROM archlinux:latest
-RUN pacman -Syu --noconfirm \780
+RUN pacman -Syu --noconfirm \
     && pacman -S git base-devel --noconfirm \
     && pacman -Scc --noconfirm
 RUN pacman -S python --noconfirm 
