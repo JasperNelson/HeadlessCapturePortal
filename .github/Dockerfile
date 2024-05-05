@@ -13,6 +13,8 @@ RUN pyenv update
 RUN pyenv install -f 3.12.2 
 RUN pyenv global 3.12.2
 RUN pyenv rehash
+WORKDIR /app
+COPY . /app
 RUN pip install -r requirements.txt 
 RUN dbus-run-session -- sh 
 RUN echo 'creds' | gnome-keyring-daemon
