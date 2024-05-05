@@ -17,5 +17,5 @@ jobs:
     - name: Start Docker Image 
       run: docker start dockerarch
     - name: Docker Simple Pytest
-      run: docker exec -it my_container pytest 
+      run: docker exec -it dockerarch pytest 
    
