@@ -18,7 +18,9 @@ COPY . /app
 RUN pip install -r requirements.txt 
 RUN dbus-run-session -- sh 
 RUN echo 'creds' | gnome-keyring-daemon
-CMD pytest
+
+
+
 
 
 
