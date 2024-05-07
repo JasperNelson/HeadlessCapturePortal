@@ -2,11 +2,6 @@ name: Capture-DockerCreate
 #builds a docker container for use 
 on:
    workflow_dispatch:
-      inputs:
-         logLevel:
-         description: 'Log level for manual trigger'
-         required: false
-         default: 'info'
    schedule:
        - cron: "0 0 * * *"
 jobs: 
