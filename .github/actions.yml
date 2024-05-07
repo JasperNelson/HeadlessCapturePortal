@@ -1,23 +1,24 @@
 name: Capture-DockerCreate
 #builds a docker container for use 
-schedule:
-    - cron: "0 0 * * *"
+on:
+   schedule:
+       - cron: "0 0 * * *"
 jobs: 
   Docker-Create:
-    runs-on: ubuntu-latest
-    steps: 
-    - uses: actions/checkout@v4
-     - name: Build Docker Image
-        run: docker build -t  .
-     - name: Create Container
-        run: docker create --name dockerarch:latest Dockerfile
-     - name: Save Docker Container
-        run: docker save dockerarch:latest -o dockerarch.tar
-     - name: Upload artifact of docker image
-       uses: actions/upload-artifact@v4
-       with: 
-         name: dockerarch-image
-         path: dockerarch.tar
+   runs-on: ubuntu-latest
+   steps: 
+   - uses: actions/checkout@v4
+   - name: Build Docker Image
+   run: docker build -t  .
+   - name: Create Container
+   run: docker create --name dockerarch:latest Dockerfile
+   - name: Save Docker Container
+   run: docker save dockerarch:latest -o dockerarch.tar
+   - name: Upload artifact of docker image
+   uses: actions/upload-artifact@v4
+   with: 
+      name: dockerarch-image
+      path: dockerarch.tar
    #   - name: Copy Working Directory to Container
    #      run: docker cp . dockerarch:/.
    #   - name: Start Detatched Docker Image 
