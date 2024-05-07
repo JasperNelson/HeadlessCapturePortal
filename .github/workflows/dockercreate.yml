@@ -9,14 +9,14 @@ jobs:
    steps: 
    - uses: actions/checkout@v4
    - name: Build Docker Image
-   run: docker build -t  .
+     run: docker build -t  .
    - name: Create Container
-   run: docker create --name dockerarch:latest Dockerfile
+     run: docker create --name dockerarch:latest Dockerfile
    - name: Save Docker Container
-   run: docker save dockerarch:latest -o dockerarch.tar
+     run: docker save dockerarch:latest -o dockerarch.tar
    - name: Upload artifact of docker image
-   uses: actions/upload-artifact@v4
-   with: 
+     uses: actions/upload-artifact@v4
+     with: 
       name: dockerarch-image
       path: dockerarch.tar
    #   - name: Copy Working Directory to Container
