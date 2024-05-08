@@ -1,5 +1,5 @@
 import tomllib as toml
-from typing import Optional, NamedTuple, Any, Type, TypeVar, IO, cast
+from typing import IO, cast
 
 def TOMLRead(f: IO[bytes] | str) -> dict:
     """
