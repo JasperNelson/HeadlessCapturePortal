@@ -1,7 +1,6 @@
 import keyring as ky #handles keyrings for us.
 from keyring.backends import Windows, SecretService, kwallet, macOS, libsecret 
 import bitwarden_keyring #bitwarden backend for keyring
-import re #regex module 
 from typing import cast
 from getpass import getpass as gp
 from dataclasses import dataclass #module for dataclasses

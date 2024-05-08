@@ -1,4 +1,4 @@
-from TOMLRead import TOMLRead
+from Captr.TOMLRead import TOMLRead
 from typing import Optional, NamedTuple, Type, TypeVar, IO, cast, Generic, Type, ClassVar
 import os
 

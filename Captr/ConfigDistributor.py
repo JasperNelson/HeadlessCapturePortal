@@ -1,4 +1,4 @@
-from ConfigParser import Config
+from Captr.ConfigParser import Config
 #Makes a object that uses the values set in the Config  
 
 class ConfigDistributor(): #Inherit ME!!!

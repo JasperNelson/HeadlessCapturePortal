@@ -1,66 +1,52 @@
 [NETWORK]
-#if set, will cause an error to occur if the SSID does not match 
 SSID="examplewifi" 
-#overrides the default starting URL for the capture portal. 
-URL="https://example.com" #IMPORTANT: Additionally this is (needed for keyring functionality)
-#IP address of the Capture Portal 
+URL="https://example.com" 
 IP="1.0.0.1"
 
-[[ACTION]] #ID is unique
+[[ACTION]] 
 action="click"
-id="example" #ID supports regular expressions
+id="example" 
 
 
-[[ACTION]] #IMPORTANT: can select many (as there can be many with results from a xpath)
+[[ACTION]]
 action="click"
-#the x-path of the respective element(s) that you desire to select
 x-path="/html/body/div/div/main/div/p[81]"
+#### WILL THROW ERROR CANNOT have more than 1
+id=""
 
 
-[[ACTION]] #IMPORTANT: can select many (as there can be many with name)
-action="click"
-#the name of the respective element that you desire to select as well as their pos in the webpage
+[[ACTION]]
 name="examplename" 
 
 
-[[ACTION]] #can select many (as there can be many with same type)
+[[ACTION]]
 action="click"
-#the type of the respective element(s) that you desire to select 
 type="checkbox"
 
 [[ACTION]]
 action="wait"
-wait=30 #will wait 30 seconds before proceeding
+wait=30
 
 [[ACTION]]
-action="text" # will enter text into a field or value
+action="text"
 name="name"
-#string to automatically enter into the field.
-#if not present will prompt the user for one
+
 
 [[ACTION]]
-action="text" # will enter text into a field or value
+action="text" 
 name="name"
-#string to automatically enter into the field.
-#if not present will prompt the user for one
 value="examplestringEGUserName"
 
-# OTHER SUPPORTED METHODS OF ENTERING INFORMATION INTO FIELDS
-# Its highly recommended not to store passwords in plaintext!!!
+
 [[ACTION]]  
 action= "text"
 name = "password"
-#when this is set to true it will utilize your operating systems keyring to securely store a password
-#During the first run of this config you will be prompted to enter the information into the respective fields
-#In order to change the set keyring value(s) pass in the argument -R during initialization 
 keyring=true  
 
 [[ACTION]]
-#moves to a new page with a specified href by the href url
 action= "move"
 href= "href_url"    
 
 [[ACTION]]
-#moves to a new page with a specified ID value
 action= "move"
 id= "ID" 
