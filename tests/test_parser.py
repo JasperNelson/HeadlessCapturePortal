@@ -1,7 +1,7 @@
 import pytest
 from tomllib import TOMLDecodeError
 from typing import NamedTuple
-from Captr.LoginParser import LoginParser
+from ..Captr.LoginParser import LoginParser
 
 #checks to see if the fuctionality of the class is intact
 print(((LoginParser(r"EXAMPLE.toml")).export))

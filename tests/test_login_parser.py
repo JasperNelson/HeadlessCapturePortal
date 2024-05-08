@@ -1,7 +1,8 @@
 from io import BytesIO
 from typing import IO, cast
+import sys 
 from Captr.TOMLRead import TOMLRead
-from Captr.LoginParser import LoginParser, Action
+from ..Captr.LoginParser import LoginParser, Action
 
 def test_toml_read() -> None:
     # Given
