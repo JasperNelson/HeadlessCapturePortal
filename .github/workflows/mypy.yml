@@ -12,7 +12,7 @@ jobs:
       with:
         name: dockerarch-image
         github-token: ${{ secrets.ARTIFACTS }}
-        repository: JasperNelson/HeadlessCapturePortal
+        repository: JasperNelson/HeadlessCapturePortal/actions/workflows/dockercreate.yml
         run: docker load -i dockerarch.tar
     - name: Copy Working Directory to Container
       run: docker cp . dockerarch:/.
