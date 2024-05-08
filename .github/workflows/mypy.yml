@@ -11,8 +11,11 @@ jobs:
       uses: actions/download-artifact@v4
       with:
         name: dockerarch-image
+        github-token: ${{ secrets.ARTIFACTS }}
+        repository: JasperNelson/HeadlessCapturePortal
         run: docker load -i dockerarch.tar
     - name: Copy Working Directory to Container
       run: docker cp . dockerarch:/.
     - name: Start Detatched Docker Image 
       run: docker start -d dockerarch
+      
