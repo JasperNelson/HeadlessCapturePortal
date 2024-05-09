@@ -1,6 +1,6 @@
 from __future__ import annotations
 #Parses TOML files into digestible python variables and objects
-from TOMLRead import TOMLRead
+from Captr.TOMLRead import TOMLRead
 from typing import Optional, NamedTuple, Any, Type, TypeVar, IO, cast
 
 
