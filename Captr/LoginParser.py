@@ -181,27 +181,30 @@ class LoginParser():
             # parses the actions and puts the values into action objects
             for action in actions:
                 place+=1
-                match action["action"]:
-                    case 'wait':
-                        wait=v.waittest(action)
-                        #creates action object, because its type wait cannot have an id-type 
-                        toDo.append(Action(type='wait', value={'wait' : wait}))
-                    case 'text':
-                        tp=v.texttest(action)
-                        idtype=tp[0]
-                        valuetype=tp[1]
-                        #creates action object and adds it to the list, The value can be None, when the user wants to be prompted for the password
-                        toDo.append(Action('text', {idtype : action[idtype]}, value={valuetype : action[valuetype]} if valuetype!=None else None))
-                    case 'click':
-                        idtype=v.clicktest(action)
-                        #creates action object and adds it to the list
-                        toDo.append(Action('click', {idtype : action[idtype]}))
-                    case 'move':
-                        idtype=v.movetest(action)
-                        #creates action object and adds it to the list
-                        toDo.append(Action('move', {idtype : action[idtype]}))
-                    case _:
-                        raise ValueError(f"missing And/or invalid action in action#{place}")
+                try:
+                    match action["action"]:
+                        case 'wait':
+                            wait=v.waittest(action)
+                            #creates action object, because its type wait cannot have an id-type 
+                            toDo.append(Action(type='wait', value={'wait' : wait}))
+                        case 'text':
+                            tp=v.texttest(action)
+                            idtype=tp[0]
+                            valuetype=tp[1]
+                            #creates action object and adds it to the list, The value can be None, when the user wants to be prompted for the password
+                            toDo.append(Action('text', {idtype : action[idtype]}, value={valuetype : action[valuetype]} if valuetype!=None else None))
+                        case 'click':
+                            idtype=v.clicktest(action)
+                            #creates action object and adds it to the list
+                            toDo.append(Action('click', {idtype : action[idtype]}))
+                        case 'move':
+                            idtype=v.movetest(action)
+                            #creates action object and adds it to the list
+                            toDo.append(Action('move', {idtype : action[idtype]}))
+                        case _:
+                            raise ValueError(f"missing And/or invalid action in action#{place}")
+                except KeyError:
+                    raise KeyError("One of your steps is missing a action")
             self.export=self.Ingest(Network=net, Actions=toDo)
             return self.export 
         else:

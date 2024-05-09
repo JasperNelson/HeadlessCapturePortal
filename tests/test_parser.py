@@ -16,7 +16,7 @@ def  test_Bad_Login_Files() -> None:
         LoginParser(r"./TestingFiles/CORRUPTED_TOML")
     with pytest.raises(ValueError):
         LoginParser(r"./TestingFiles/BADLOGIN.toml")
-    with pytest.raises(ValueError):
+    with pytest.raises(KeyError):
         LoginParser(r"./TestingFiles/BADLOGIN_2.toml")
     with pytest.raises(ValueError):
         LoginParser(r"./TestingFiles/BADLOGIN_3.toml")
