@@ -15,17 +15,20 @@ class Config():
     """
     _instance: 'Config' | None = None
     
-    def __new__(cls: Type['Config'], filepath: str) -> 'Config':
+    def __new__(cls: Type['Config'], filepath: str | IO[bytes]) -> 'Config':
         """Enforces the Singleton Design Pattern"""
         if cls._instance is None:
             cls._instance= super(Config, cls).__new__(cls)
         return cls._instance
     
     def __init__(self, filepath: str="") -> None:
-        if os.environ.get("CAPTURE_CONFIG") != None:
-            self.filepath=os.environ.get("CAPTURE_CONFIG")
-        else:
-            self.filepath = str(filepath)
+        if Type==IO[bytes]:
+            self.filepath=filepath
+        else:  
+            if os.environ.get("CAPTURE_CONFIG") != None:
+                self.filepath=cast(str,os.environ.get("CAPTURE_CONFIG"))
+            else:
+                self.filepath = str(filepath)
         self.tml=self.ConfParse()
 
     class Ingest(NamedTuple):

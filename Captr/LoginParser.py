@@ -1,6 +1,6 @@
 from __future__ import annotations
 #Parses TOML files into digestible python variables and objects
-from Captr.TOMLRead import TOMLRead
+from TOMLRead import TOMLRead
 from typing import Optional, NamedTuple, Any, Type, TypeVar, IO, cast
 
 
@@ -80,7 +80,7 @@ class LoginParser():
 
 
 
-    def __init__(self, filepath: IO[bytes] | str="") -> None:
+    def __init__(self, filepath: IO[bytes] | str) -> None:
         """
         Constructs a LoginParser object that parses the given input.
 
@@ -88,7 +88,7 @@ class LoginParser():
         - filepath: Either a string that points to a TOML file or a Python file-like
           such as what you can get from calling open(foo, "rb") or io.BytesIO().
         """
-        self.filepath: IO[bytes] | str | None = None
+        self.filepath: IO[bytes] | str
         if type(filepath) == str:
             # Read the file from disk.
             self.filepath = cast(str, filepath)
