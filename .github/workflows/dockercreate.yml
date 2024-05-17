@@ -20,3 +20,31 @@ jobs:
      with: 
       name: dockerarch-image
       path: dockerarch.tar
+  Artifact-Destroy: 
+    needs: Docker-Create
+    runs-on: ubuntu-latest
+    steps: 
+    - name: Read_Previous_Artifacts
+      run: |
+        curl -s -L\
+        -H "Accept: application/vnd.github+json" \
+        -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+        https://api.github.com/repos/${{ github.repository }}/actions/artifacts \
+        | jq -r '.artifacts[] | select(.workflow_run.head_branch == "main") | .id' > artifact_ids.txt
+    - name: Delete_Other_Artifacts
+      run: |
+        x=0
+        while IFS= read -r artifact_id
+        do
+        if [ $counter -ne 0 ]; then
+        echo "Deleting artifact $artifact_id"
+        curl -s -L -X DELETE -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+        https://api.github.com/repos/${{ github.repository }}/actions/artifacts/$artifact_id
+        fi
+        x=$((x + 1))
+        done < artifact_ids.txt
+       
+
+
+
+
