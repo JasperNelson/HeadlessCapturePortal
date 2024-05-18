@@ -38,7 +38,7 @@ jobs:
         x=0
         while IFS= read -r artifact_id
         do
-        if [ $counter -ne 0 ]; then
+        if [ "$counter" -ne 0 ]; then
         echo "Deleting artifact $artifact_id"
         curl -s -L -X DELETE -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
         https://api.github.com/repos/${{ github.repository }}/actions/artifacts/$artifact_id
