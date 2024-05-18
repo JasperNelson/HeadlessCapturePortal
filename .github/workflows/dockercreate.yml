@@ -5,23 +5,23 @@ on:
    schedule:
        - cron: "0 0 * * *"
 jobs: 
-  # Docker-Create:
-  #  runs-on: ubuntu-latest
-  #  steps: 
-  #  - uses: actions/checkout@v4
-  #  - name: CD build
-  #    run: docker buildx build -t dockerarch -f .github/Dockerfile .
-  #  - name: Create Container
-  #    run: cd .github && docker create --name dockerarch dockerarch
-  #  - name: Save Docker Container
-  #    run: docker save dockerarch:latest -o dockerarch.tar
-  #  - name: Upload artifact of docker image
-  #    uses: actions/upload-artifact@v4
-  #    with: 
-  #     name: dockerarch-image
-  #     path: dockerarch.tar
+  Docker-Create:
+   runs-on: ubuntu-latest
+   steps: 
+   - uses: actions/checkout@v4
+   - name: CD build
+     run: docker buildx build -t dockerarch -f .github/Dockerfile .
+   - name: Create Container
+     run: cd .github && docker create --name dockerarch dockerarch
+   - name: Save Docker Container
+     run: docker save dockerarch:latest -o dockerarch.tar
+   - name: Upload artifact of docker image
+     uses: actions/upload-artifact@v4
+     with: 
+      name: dockerarch-image
+      path: dockerarch.tar
   Artifact-Destroy: 
-    # needs: Docker-Create
+    needs: Docker-Create
     runs-on: ubuntu-latest
     steps: 
     - name: Read_Previous_Artifacts
@@ -33,12 +33,12 @@ jobs:
         | jq -r '.artifacts[] | select(.workflow_run.head_branch == "main") | .id' > artifact_ids.txt
     - name: Debug print
       run: cat artifact_ids.txt
-    - name: Delete_Other_Artifacts
+    - name: Delete_Other_Artifacts # cleans up versions of the docker container created before. 
       run: |
         x=0
         while IFS= read -r artifact_id
         do
-        if [ $x -ne 0 ]; then
+        if [ $x -ge 1 ]; then 
         echo "Deleting artifact $artifact_id"
         curl -s -L -X DELETE -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
         https://api.github.com/repos/${{ github.repository }}/actions/artifacts/$artifact_id
