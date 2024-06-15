@@ -1,3 +1,5 @@
+
 LoginFilesDir="/Home/Users/Foo/.LoginLoc"
 PromptForSafety=true
-Logging=true
+Logging=true # forces the captive portal to be one that 
+Disallow302=false

@@ -3,8 +3,9 @@
 SSID="examplewifi" 
 #overrides the default starting URL for the capture portal. 
 URL="https://example.com" #IMPORTANT: Additionally this is (needed for keyring functionality)
-#IP address of the Capture Portal 
-IP="1.0.0.1"
+#MAC address of the Capture Portal 
+MAC="00-B0-D0-63-C2-26"
+EnforceHTTPS=true
 
 [[ACTION]] #ID is unique
 action="click"

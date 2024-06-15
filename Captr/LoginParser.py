@@ -75,8 +75,12 @@ class LoginParser():
         """
         Subclass of TOMLparser that defines a NamedTuple which is used for returning the value of the class
         """
-        Network: dict
         Actions: list[Action] #forward reference
+        SSID: Optional[Optional[dict | None]] = None 
+        URL: Optional[ str | None] = None  
+        MAC: Optional[ str | None] = None
+        EnforceHTTPS: Optional[ bool ] = False
+        
 
 
 
@@ -117,7 +121,7 @@ class LoginParser():
         """
         def __init__(self) -> None:
             """
-            contains the crucial and valid expressions for the TOML file used as a refrence for errors
+            contains the crucial and valid expressions for each action type in the TOML file used as a refrence for errors
             """
             #allowed Identification values that are compatable with every action type
             self.t_identify_all=["x-path", "id", "name", "type"]
@@ -125,6 +129,7 @@ class LoginParser():
             self.t_identify_move=self.t_identify_all+["href"]
                 #valid set values for text
             self.t_choice_text=["value", "keyring"]
+            self
 
         #identifies the key type being used as well as if there is only 1 of them.
         def identifytest(self, action: dict, method: list) -> str:
@@ -174,10 +179,31 @@ class LoginParser():
         #checks if the TOML file contains the two main Dictionaries 
         if all(x in vParent for x in tml):
             net=tml['NETWORK']
+            cast(dict, net)
             actions=tml['ACTION']
             place=0 #tracks the place
             toDo=[]
+            mac=None
+            url=None
+            https=False
+            ssid=None
+            
             v=self._var_test()
+            for options in net:
+                try: 
+                    match str(options):
+                        case 'SSID':
+                            ssid=net[options]
+                        case 'URL':
+                            url=net[options]
+                        case 'MAC':
+                            mac=net[options]
+                        case 'EnforceHTTPS':
+                            https=bool(net[options])
+                        case _:
+                            raise ValueError(f"invalid option in network")
+                except ValueError:
+                    raise ValueError("One of your steps contains a value of the wrong type \n e.g a boolean instead of a string")
             # parses the actions and puts the values into action objects
             for action in actions:
                 place+=1
@@ -205,11 +231,11 @@ class LoginParser():
                             raise ValueError(f"missing And/or invalid action in action#{place}")
                 except KeyError:
                     raise KeyError("One of your steps is missing a action")
-            self.export=self.Ingest(Network=net, Actions=toDo)
+            self.export=self.Ingest(URL=url, EnforceHTTPS=https, MAC=mac, SSID=ssid, Actions=toDo)
             return self.export 
         else:
             raise ValueError("Error, your either missing NETWORK or ACTION from your LoginFile")
-    
+        
     def changeconfigfile(self,filepath: str="") -> None:
         """
         Changes the path of the set config file to the new path supplied AND parses it
