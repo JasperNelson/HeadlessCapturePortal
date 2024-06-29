@@ -1,5 +1,7 @@
 from __future__ import annotations
 import requests as rq
+import logging
+import yaml
 from typing import NamedTuple, Type
 
 
@@ -15,7 +17,9 @@ class CaptiveDetector:
         PortalResult: Boolean, True if a captive portal is found that matches the files choice to possibly mandate HTTPS
         
     """
-    def __init__(self, URL: str, HTTPSonlyswitch: bool = False) -> None: 
+    def __init__(self,  URL: str, HTTPSonlyswitch: bool = False, loggingSwitch: bool = True) -> None: 
+        with open ('logging.yml', 'r') as file:
+            logging.config.dictConfig(yaml.safe_load(file))
         self._URL=URL
         self._session=rq.Session()
         self._session.headers.update({'User-Agent': 'Mozilla/5.0 (Windows NT 10.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/104.0.0.0 Safari/537.36'})
@@ -44,10 +48,6 @@ class CaptiveDetector:
             
         else: 
             return(False)
-
-            
-
         
-
 n=CaptiveDetector('http://ping.archlinux.org', False)
 print(n.resultcode)

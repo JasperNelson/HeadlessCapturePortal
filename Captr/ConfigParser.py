@@ -39,16 +39,16 @@ class Config():
         logging: bool
         safetyPrompt: bool
         loginFilesDir: str #forward reference
-        DetectorMode: int
+        Disallow3XX: bool
 
     def ConfParse(self) -> Ingest:
         """
         Ingests the configuration file and stores the variables, it is then output as a Ingest Named tuple. 
         """
-        ConfigVars=["LoginFilesDir", "PromptForSafety", "Logging", "PortalDetectorMode"]
+        ConfigVars=["LoginFilesDir", "PromptForSafety", "Logging", "Disallow3XX"]
         tml=TOMLRead(self.filepath)
         if all(x in ConfigVars for x in tml):
-            self.tml= self.Ingest(logging=tml["Logging"], loginFilesDir=tml["LoginFilesDir"], safetyPrompt=tml["PromptForSafety"], DetectorMode=tml["PortalDetectorMode"])
+            self.tml= self.Ingest(logging=tml["Logging"], loginFilesDir=tml["LoginFilesDir"], safetyPrompt=tml["PromptForSafety"], DetectorMode=tml["Disallow3XX"])
             return(self.tml)
         else:
             raise ValueError("Error, your CONFIG is MALFORMED")
