@@ -3,12 +3,13 @@ import argparse
 from typing import Type
 from Captr.ConfigParser import Config
 from Captr.Orchestrator import Orchestrator
+from typing import Optional, List
 import os
 
 
 #This goes into the help page
 
-def Intake() -> argparse.Namespace:
+def Intake(pargs: Optional[List[str]] = None) -> argparse.Namespace:
     #in general flags that start with a capital letter change the purpose of the program and cannot be combined with other capitilized flags.
     argparser=argparse.ArgumentParser(
         prog="Capture",
@@ -54,7 +55,7 @@ def Intake() -> argparse.Namespace:
         '-A', '--Auto',
         nargs='?',
         type=str,
-        default=False,
+        default="",
         help="If specified will automatically search through your login files stored in the login directory specified in your config file and log you in"
         "into a network that matches the URL \n and(if specified) the SSID of the login file to the current network"
         )
@@ -65,12 +66,13 @@ def Intake() -> argparse.Namespace:
         action='store_true',
         help="for use with -A/--Auto, will stop asking to use a config file to log into a network"    
         )
-    args=(argparser.parse_args())
+    args= argparser.parse_args() if pargs is None else argparser.parse_args(pargs)
     return args
     #ROADMAPPED: Not yet implemented: 
     # argparser.add_argument('-G', '--Guided', help="Flag that will try to guide the user through a login session with choices and everything")
 # Use this when logging into the network
 ToUse=Intake()
 print(ToUse)
-Orchestrator(ToUse)
+
+#Orchestrator(ToUse, )
 # conf=Config(filepath=str(os.environ["HOME"]+"/.LoginFiles")) #Would have been created during the initial setup

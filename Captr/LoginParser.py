@@ -249,6 +249,6 @@ class LoginParser():
         '''
         return self.export
 
-v=LoginParser(r"EXAMPLE.toml")
-print(v.result())
+# v=LoginParser(r"EXAMPLE.toml")
+# print(v.result())
 
