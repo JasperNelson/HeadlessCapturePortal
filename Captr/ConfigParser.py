@@ -28,28 +28,30 @@ class Config():
         else:  
             if os.environ.get("CAPTURE_CONFIG") != None:
                 self.filepath=cast(str,os.environ.get("CAPTURE_CONFIG"))
-            else:
+            elif filepath!="":
                 self.filepath = str(filepath)
-        self.tml=self.ConfParse()
+            else:
+                raise ValueError('Neither a supplied config dir or a environment variable CAPTURE_CONFIG could be found')
+        self.export=self.ConfParse()
 
-    class Ingest(NamedTuple):
+    class _ingest(NamedTuple):
         """
         Subclass of Config that defines a NamedTuple which is used for returning the values for the config.
         """
         logging: bool
         safetyPrompt: bool
         loginFilesDir: str #forward reference
-        Disallow3XX: bool
+        defaultBackend: str
 
-    def ConfParse(self) -> Ingest:
+    def ConfParse(self) -> _ingest:
         """
         Ingests the configuration file and stores the variables, it is then output as a Ingest Named tuple. 
         """
-        ConfigVars=["LoginFilesDir", "PromptForSafety", "Logging", "Disallow3XX"]
+        ConfigVars=["LoginFilesDir", "PromptForSafety", "Logging", "DefaultBackend"] 
         tml=TOMLRead(self.filepath)
         if all(x in ConfigVars for x in tml):
-            self.tml= self.Ingest(logging=tml["Logging"], loginFilesDir=tml["LoginFilesDir"], safetyPrompt=tml["PromptForSafety"], DetectorMode=tml["Disallow3XX"])
-            return(self.tml)
+            self.export= self._ingest(logging=tml["Logging"], loginFilesDir=tml["LoginFilesDir"], safetyPrompt=tml["PromptForSafety"], defaultBackend=tml["DefaultBackend"])
+            return(self.export)
         else:
             raise ValueError("Error, your CONFIG is MALFORMED")
             

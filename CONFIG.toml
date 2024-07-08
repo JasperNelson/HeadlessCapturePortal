@@ -1,4 +1,5 @@
 LoginFilesDir="/Users/Jasper/Documents/Workspace/CaptrPortalex"
 PromptForSafety=true
 Logging=true # turns on logging
-Disallow3XX=false # disallow 3XX portals
+#lets you change the default backend to be used
+DefaultBackend="Debug"

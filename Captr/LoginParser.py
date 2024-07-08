@@ -71,14 +71,14 @@ class LoginParser():
     """
 
  
-    class Ingest(NamedTuple):
+    class _ingest(NamedTuple):
         """
         Subclass of TOMLparser that defines a NamedTuple which is used for returning the value of the class
         """
         Actions: list[Action] #forward reference
         SSID: Optional[Optional[dict | None]] = None 
         URL: Optional[ str | None] = None  
-        MAC: Optional[ str | None] = None
+        Backend: Optional[ str | None] = None
         EnforceHTTPS: Optional[ bool ] = False
         
 
@@ -98,7 +98,7 @@ class LoginParser():
             self.filepath = cast(str, filepath)
         else:
             self.filepath = cast(IO[bytes], filepath)    
-        self.export: LoginParser.Ingest
+        self.export: LoginParser._ingest
         self.ingest = self._loginparse()
     
     def __str__(self) -> str:
@@ -124,7 +124,7 @@ class LoginParser():
             contains the crucial and valid expressions for each action type in the TOML file used as a refrence for errors
             """
             #allowed Identification values that are compatable with every action type
-            self.t_identify_all=["x-path", "id", "name", "type"]
+            self.t_identify_all=["id", "name", "type"]
             #extra allwed ID value for move
             self.t_identify_move=self.t_identify_all+["href"]
                 #valid set values for text
@@ -183,7 +183,7 @@ class LoginParser():
             actions=tml['ACTION']
             place=0 #tracks the place
             toDo=[]
-            mac=None
+            backend=None
             url=None
             https=False
             ssid=None
@@ -196,8 +196,8 @@ class LoginParser():
                             ssid=net[options]
                         case 'URL':
                             url=net[options]
-                        case 'MAC':
-                            mac=net[options]
+                        case 'Backend':
+                            backend=net[options]
                         case 'EnforceHTTPS':
                             https=bool(net[options])
                         case _:
@@ -231,7 +231,7 @@ class LoginParser():
                             raise ValueError(f"missing And/or invalid action in action#{place}")
                 except KeyError:
                     raise KeyError("One of your steps is missing a action")
-            self.export=self.Ingest(URL=url, EnforceHTTPS=https, MAC=mac, SSID=ssid, Actions=toDo)
+            self.export=self._ingest(URL=url, EnforceHTTPS=https, Backend=backend, SSID=ssid, Actions=toDo)
             return self.export 
         else:
             raise ValueError("Error, your either missing NETWORK or ACTION from your LoginFile")

@@ -5,6 +5,7 @@ from Captr.ConfigParser import Config
 from Captr.Orchestrator import Orchestrator
 from typing import Optional, List
 import os
+from Captr.LoggingRead import readLoggingConfig
 
 
 #This goes into the help page
@@ -59,7 +60,6 @@ def Intake(pargs: Optional[List[str]] = None) -> argparse.Namespace:
         help="If specified will automatically search through your login files stored in the login directory specified in your config file and log you in"
         "into a network that matches the URL \n and(if specified) the SSID of the login file to the current network"
         )
-
     #safety prompt override
     argparser.add_argument(
         '-y', '--yes',
@@ -72,7 +72,7 @@ def Intake(pargs: Optional[List[str]] = None) -> argparse.Namespace:
     # argparser.add_argument('-G', '--Guided', help="Flag that will try to guide the user through a login session with choices and everything")
 # Use this when logging into the network
 ToUse=Intake()
-print(ToUse)
+readLoggingConfig()
 
-#Orchestrator(ToUse, )
+Orchestrator(ToUse)
 # conf=Config(filepath=str(os.environ["HOME"]+"/.LoginFiles")) #Would have been created during the initial setup

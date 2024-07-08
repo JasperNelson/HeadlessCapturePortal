@@ -1,17 +1,16 @@
-#backend that simply uses the information from the config as well as argparse and implements it. 
+#Debug backend for testing purposes
 from Captr.backend import backend
 from Captr.ConfigParser import Config
 from Captr.LoginParser import Action, LoginParser
 from typing import NamedTuple
-#NOTE: right now this is simply a copy of DebugBackend! the real simplebackend will be implemented later. 
-class SimpleBackend(backend):
+class DebugBackend(backend):
     
     def URL_Fetch(self, URL: str, config: NamedTuple) -> str:
         print(f"URL:{URL}"+f"\n config:{config}")
-        return "simple"
+        return "Debug"
     def Layout_Fetch(self, URL: str) -> str:
         print(f"URL:{URL}")
-        return "simple"
+        return "Debug"
     def Move(self, locator: dict) -> bool:
         print(f"Move action -> locator:{locator}")
         return True

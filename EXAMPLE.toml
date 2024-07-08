@@ -3,8 +3,8 @@
 SSID="examplewifi" 
 #overrides the default starting URL for the capture portal. 
 URL="https://example.com" #IMPORTANT: Additionally this is (needed for keyring functionality)
-#MAC address of the Capture Portal 
-MAC="00-B0-D0-63-C2-26"
+# if set will change the backend to be used, needs to be one of the supported backends look at backends in readme
+Backend="Debug"
 EnforceHTTPS=true
 
 [[ACTION]] #ID is unique
@@ -12,10 +12,6 @@ action="click"
 id="example" #ID supports regular expressions
 
 
-[[ACTION]] #IMPORTANT: can select many (as there can be many with results from a xpath)
-action="click"
-#the x-path of the respective element(s) that you desire to select
-x-path="/html/body/div/div/main/div/p[81]"
 
 
 [[ACTION]] #IMPORTANT: can select many (as there can be many with name)

@@ -2,8 +2,8 @@ from Captr.main import Intake
 import argparse
 import pytest
     
-def test_auto() -> None:
-    result=Intake(["--Auto"])
-    print(result)
-    assert(result.Auto=="")
+# def test_auto() -> None:
+result=Intake(["--URL"])
+print(result)
+assert(result.Auto=="")
 

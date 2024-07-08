@@ -18,8 +18,8 @@ class CaptiveDetector:
         
     """
     def __init__(self,  URL: str, HTTPSonlyswitch: bool = False, loggingSwitch: bool = True) -> None: 
-        with open ('logging.yml', 'r') as file:
-            logging.config.dictConfig(yaml.safe_load(file))
+        #with open ('logging.yml', 'r') as file:
+#            logging.config.dictConfig(yaml.safe_load(file))
         self._URL=URL
         self._session=rq.Session()
         self._session.headers.update({'User-Agent': 'Mozilla/5.0 (Windows NT 10.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/104.0.0.0 Safari/537.36'})
