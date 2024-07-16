@@ -47,7 +47,7 @@ class LoginParser():
     tomlparse() -> Ingest(named Tuple)
         Parses the TOML file, validates its structure, and creates a tuple containing network details
         and a list of Actions based on the 'ACTION' section of the TOML Login file.
-    changeconfigfile(filepath: str)
+    changeloginfile(filepath: str)
         Updates the filepath of the TOML file to parse and re-invokes parsing.
     ingest():
         returns the ingested TOML datastructure. 
@@ -129,7 +129,6 @@ class LoginParser():
             self.t_identify_move=self.t_identify_all+["href"]
                 #valid set values for text
             self.t_choice_text=["value", "keyring"]
-            self
 
         #identifies the key type being used as well as if there is only 1 of them.
         def identifytest(self, action: dict, method: list) -> str:
@@ -236,19 +235,13 @@ class LoginParser():
         else:
             raise ValueError("Error, your either missing NETWORK or ACTION from your LoginFile")
         
-    def changeconfigfile(self,filepath: str="") -> None:
+    def changeloginfile(self,filepath: str="") -> None:
         """
-        Changes the path of the set config file to the new path supplied AND parses it
+        Changes the path of the set login file to the new path supplied AND parses it
         """
         self.filepath=filepath
         self.ingest=self._loginparse()
 
-    def result(self) -> object:
-        '''
-        returns the ingested data. 
-        '''
-        return self.export
-
-# v=LoginParser(r"EXAMPLE.toml")
-# print(v.result())
+v=LoginParser(r"EXAMPLE.toml")
+print(v.export.URL)
 

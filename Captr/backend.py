@@ -17,7 +17,7 @@ class backend(ABC):
     def Text(self, locator: dict, value: str) -> bool:
         pass
     @abstractmethod
-    def Wait(self, Timespan: int) -> bool:
+    def Wait(self, timespan: int) -> bool:
         pass
     @abstractmethod
     def Click(self, locator: dict) -> bool:

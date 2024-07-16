@@ -1,4 +1,4 @@
-LoginFilesDir="/Users/Jasper/Documents/Workspace/CaptrPortalex"
+LoginFilesDir="/"
 PromptForSafety=true
 Logging=true # turns on logging
 #lets you change the default backend to be used

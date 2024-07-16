@@ -16,7 +16,7 @@ def Intake(pargs: Optional[List[str]] = None) -> argparse.Namespace:
         prog="Capture",
         add_help=True,
         description="A cross platform tool for logging into captive portals headlessly, as well as automation.",
-        epilog="Made with love by Jasper and Daniella"
+        epilog="Made with love by Jasper with the help of Uche and others"
         )
     mode=argparser.add_argument_group('MODE:', 'Changes the Mode/Function of the program')
     modeX=mode.add_mutually_exclusive_group()
@@ -27,7 +27,13 @@ def Intake(pargs: Optional[List[str]] = None) -> argparse.Namespace:
         help="Verbose flag that will output the logs to the shell that the program was called from" 
         "Wont work if logging is disabled in the config"
         )
-
+    argparser.add_argument(
+        'default',
+        nargs=1,
+        type=str,
+        help="Verbose flag that will output the logs to the shell that the program was called from" 
+        "Wont work if logging is disabled in the config"
+        )
     #Return HTML of url
     modeX.add_argument(
         '-L', '--Layout',
@@ -73,6 +79,6 @@ def Intake(pargs: Optional[List[str]] = None) -> argparse.Namespace:
 # Use this when logging into the network
 ToUse=Intake()
 readLoggingConfig()
-
+#logging.basicConfig(filename='myapp.log', level=logging.INFO)
 Orchestrator(ToUse)
 # conf=Config(filepath=str(os.environ["HOME"]+"/.LoginFiles")) #Would have been created during the initial setup
