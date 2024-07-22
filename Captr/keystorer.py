@@ -40,8 +40,15 @@ class KeyManager():
     except NameError: 
        error=f"The backend specified for your keyring ({self.userKeyringBackend}) is not accessible or installed"
        raise NameError(error) 
+    
   #temporary prompt to ask the user for their password
+  #TODO: please remake this later on 
   def _tmp_prompt(self) ->str:
+    '''
+    Method to primpt a prompt and to enter a password into the OS's Keyring
+    Only called if there is nothing currently stored in the keyring
+    '''
+    print(f"detecting first time login, need to provide password for {self.username}")
     while(True):
       first=gp(prompt=Fore.GREEN+"\n ---- Please give us the password to store in the keyring:\n")
       second=gp(prompt=Fore.GREEN+"\n ---- One More Time:\n")
@@ -68,5 +75,5 @@ class KeyManager():
 
 
 #example implementation
-x= KeyManager(URL="https://example.com",username="jhasdlltest", keyringBackend="windows")
-print(x.key_access())
+#x= KeyManager(URL="https://example.com", username="jhasdlltest", keyringBackend="windows")
+#print(x.key_access())

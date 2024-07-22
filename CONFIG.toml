@@ -1,5 +1,20 @@
 LoginFilesDir="/"
+#turns on or off asking to log in with a toml file 
 PromptForSafety=true
 Logging=true # turns on logging
-#lets you change the default backend to be used
+#lets you change the default backend to be used for the login
 DefaultBackend="Debug"
+#Manually sets a backend to be used for saving passwords in the keyring 
+KeyringBackend=""
+# *supported keyring backends are   
+#   "secretservice":SecretService.Keyring, #for both Kwallet on KDE and libsecret in GNOME
+#   "kwallet":kwallet.DBusKeyring, #for Kwallet on linux (needs D-Bus running)
+#   "windows":Windows.WinVaultKeyring, #for Windows Vault keys
+#   "macos":macOS.Keyring, #for MacOS keys 
+#   "libsecret":libsecret.Keyring, #for gnome-keyring on linux (needs D-Bus running)
+#   "bitwarden":bitwarden_keyring #for Bitwarden. (All platforms)
+#   "": Auto Detects a backend (default)
+#The stored password is based off the URL and the passed username
+#During the first run of this config you will be prompted to enter the password into the respective field[s]
+#In order to change the set keyring password pass in the argument -R during initialization 
+

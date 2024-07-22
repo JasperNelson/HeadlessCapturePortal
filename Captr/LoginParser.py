@@ -14,16 +14,24 @@ class Action(NamedTuple):
         The type of action (e.g., 'wait', 'text', 'click', 'move').
     id : dict, optional
         The identifiers for the action, relevant for all types except 'wait'.
-    value : dict, optional
-        The values associated with the action, used for all wait and text actions.
-        Including Keyring Activation and Storage type. 
+    content : dict, optional
+        The values being entered into a field during a text action or a keyring to be called from
+        either 
+        {'keyring: List}
+        OR
+        {'value': String}
+    wait : int
+        Wait time for wait action
+    
     """
     #type of action
     type: str
-    #value is not used by wait actions
-    id: Optional[dict | None] = None  
-    #value is only used by text actions
-    value: Optional[dict | None] = None
+    #id is not used by wait actions
+    id: Optional[dict[str, str]] = None  
+    #value is only used in text actions
+    content: Optional[dict[str, str]] = None
+    #only used in wait actions
+    wait: Optional[int]=None
 
 class LoginParser():
     """
@@ -209,15 +217,15 @@ class LoginParser():
                 try:
                     match action["action"]:
                         case 'wait':
-                            wait=v.waittest(action)
+                            mwait=v.waittest(action)
                             #creates action object, because its type wait cannot have an id-type 
-                            toDo.append(Action(type='wait', value={'wait' : wait}))
+                            toDo.append(Action(type='wait', wait=int(mwait)))
                         case 'text':
                             tp=v.texttest(action)
                             idtype=tp[0]
                             valuetype=tp[1]
                             #creates action object and adds it to the list, The value can be None, when the user wants to be prompted for the password
-                            toDo.append(Action('text', {idtype : action[idtype]}, value={valuetype : action[valuetype]} if valuetype!=None else None))
+                            toDo.append(Action('text', {idtype : action[idtype]}, content={valuetype : action[valuetype]} if valuetype!=None else None))
                         case 'click':
                             idtype=v.clicktest(action)
                             #creates action object and adds it to the list
@@ -228,8 +236,8 @@ class LoginParser():
                             toDo.append(Action('move', {idtype : action[idtype]}))
                         case _:
                             raise ValueError(f"missing And/or invalid action in action#{place}")
-                except KeyError:
-                    raise KeyError("One of your steps is missing a action")
+                except TabError:
+                    raise KeyError("One of your steps is missing a action, identifier, or")
             self.export=self._ingest(URL=url, EnforceHTTPS=https, Backend=backend, SSID=ssid, Actions=toDo)
             return self.export 
         else:
@@ -242,6 +250,6 @@ class LoginParser():
         self.filepath=filepath
         self.ingest=self._loginparse()
 
-v=LoginParser(r"EXAMPLE.toml")
-print(v.export.URL)
+# v=LoginParser(r"EXAMPLE.toml")
+# print(v.export)
 

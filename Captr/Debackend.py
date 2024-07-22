@@ -4,13 +4,12 @@ from Captr.ConfigParser import Config
 from Captr.LoginParser import Action, LoginParser
 from typing import NamedTuple
 class DebugBackend(backend):
-    
-    def URL_Fetch(self, URL: str, config: NamedTuple) -> str:
-        print(f"URL:{URL}"+f"\n config:{config}")
-        return "Debug"
     def Layout_Fetch(self, URL: str) -> str:
-        print(f"URL:{URL}")
-        return "Debug"
+        print(f"This is layout_fetch we recieved the :{URL}")
+        return "simple"
+    def Start(self, URLstart: str | None ) -> bool: #default url if given
+        print(f"Move action -> URLstart:{URLstart}")
+        return True
     def Move(self, locator: dict) -> bool:
         print(f"Move action -> locator:{locator}")
         return True

@@ -2,10 +2,10 @@
 #if set, will cause an error to occur if the SSID does not match 
 SSID="examplewifi" 
 #overrides the default starting URL for the capture portal. 
-URL="https://example.com" #IMPORTANT: Additionally this is (needed for keyring functionality)
+#URL="https://example.com" #IMPORTANT: Additionally this is (needed for keyring functionality)
 # if set will change the backend to be used, needs to be one of the supported backends look at backends in readme
 Backend="Debug"
-EnforceHTTPS=true
+
 
 [[ACTION]] #ID is unique
 action="click"
@@ -47,18 +47,9 @@ value="examplestringEGUserName"
 [[ACTION]]  
 action= "text"
 name = "password"
-#when this is set it will utilize your operating systems keyring to securely store and access a password 
-#the format for the keyrings value is [username, *keyring-service] *supported backends are   
-#   "secretservice":SecretService.Keyring, #for both Kwallet on KDE and libsecret in GNOME
-#   "kwallet":kwallet.DBusKeyring, #for Kwallet on linux (needs D-Bus running)
-#   "windows":Windows.WinVaultKeyring, #for Windows Vault keys
-#   "macos":macOS.Keyring, #for MacOS keys 
-#   "libsecret":libsecret.Keyring, #for gnome-keyring on linux (needs D-Bus running)
-#   "bitwarden":bitwarden_keyring #for Bitwarden. (All platforms)
-#The stored password is based off the URL and the passed username
-#During the first run of this config you will be prompted to enter the password into the respective field[s]
-#In order to change the set keyring password pass in the argument -R during initialization 
-keyring=["YourUserName"]  
+#when this is set it will utilize your operating systems keyring to securely store and access a password for a given username
+#By default, it will automatically choose a backend, however you can manually specify one in the config
+keyring="YourUserName"  
 
 
 

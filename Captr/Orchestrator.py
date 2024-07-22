@@ -9,6 +9,8 @@ from Captr.backend import backend
 from Captr.Debackend import DebugBackend
 from Captr.SimpleBackend import SimpleBackend
 import logging
+from Captr.keystorer import KeyManager
+from CaptiveDetect import CaptiveDetector, CaptiveNotImplemented
 from typing import NamedTuple
 
 
@@ -23,36 +25,118 @@ class Orchestrator():
         self.backends={"Debug":DebugBackend, "Simple": SimpleBackend}
         self.config=Config("./CONFIG.toml")
         self.logger.debug(f"Config Vars={self.config.export}")
+        #backend used unless if specified differently in a config
         self.defaultBackend=self.config.export.defaultBackend
         self.loginFilesDir=self.config.export.loginFilesDir
+        self.keyringBackend = self.config.export.keyringBackend if self.config.export.keyringBackend != "" else None #will be None if "" in the config
     #     print(self.defaultBackend)
         #start parsing options and split
         self.relay()
 
+    def _LoginDirective(self, URL: str | None = None) -> None:
+        """
+        Internal method in Orchestrator that actually interfaces with the backends. 
+        """
 
     def _namespaceToModes(self, modes: argparse.Namespace) -> dict:
         """
-        Internal method in Orchestrator that maps argparse.Namespace to a more consistant dictionary interface
+        Internal method in Orchestrator that removes the arguments used in argparse.Namespace so they can be used 
+        for later parsing. (It will remove all the options not used)
         where False = the option was not used
         """
         result: dict ={}
-        result["verbose"]=modes.verbose if modes.verbose is not None else False
-        result["Remove"]=modes.Remove if modes.Remove is not None else False
-        result["URL"]=modes.URL if modes.URL is not None else False
-        result["Layout"]=modes.Layout if modes.Layout is not None else False
-        result["Auto"]=modes.Auto if modes.Auto != '' else False
-        result["yes"]=modes.yes if modes.yes is not None else False
-        result["default"]=modes.default if modes.default is not None else False
-
+        #Argparse.Namespace always has the keys contained in the result regardless of if they were used or not
+        #so we are going to parse if they were used or not.
+        option=False 
+        if modes.verbose is not None:
+            result["verbose"]=modes.verbose 
+        if modes.Remove is not None:
+            result["Remove"]=modes.Remove  
+        if modes.URL is not False:
+            result["URL"]=modes.URL  
+        if modes.Layout is not None:
+            result["Layout"]=modes.Layout 
+        if modes.Auto != '':
+            result["Auto"]=modes.Auto  
+        if modes.yes is not None:
+            result["yes"]=modes.yes  
+        if modes.default is not None:
+            result["default"]=modes.default 
+        if len(result.keys())==0:
+            self.logger.critical(f"You must supply a toml file if you want to continue the default arguments")
+            raise Exception
         return result
 
+
+    def Dispatch(self, login: LoginParser._ingest, CaptiveURL: str) ->None:
+        """
+        internal method of Orchestrator, used to dispatch to a backend
+        """
+        backend=self._backendBuilder(login.Backend) #activate and locate the proper backend
+        if login.URL!= CaptiveURL:
+            self.logger.info("Captive Portals dont match, skipping ...") #TODO: Make the log message more clear, were not always skipping only in auto 
+            raise(CaptiveNotImplemented)
+        else:
+            try:
+                for Act in login.Actions:
+                    match Act.type:
+                        case "click":
+                            self.logger.debug(f"sending [{Act.type}] action to backend [{backend.__class__.__name__}]")
+                            assert(isinstance(Act.id, dict))
+                            backend.Click(Act.id)
+                        case "wait":
+                            self.logger.debug(f"sending [{Act.type}] action to backend [{backend.__class__.__name__}]")
+                            if Act.wait is not None:
+                                backend.Wait(Act.wait)
+                            else: 
+                                self.logger.critical("An Unexpected Error Occured Please report this!!! CODE: 2")
+                        case "text":
+                            self.logger.debug(f"sending [{Act.type}] action to backend [{backend.__class__.__name__}]")
+                            assert(isinstance(Act.id, dict)) 
+                            assert(isinstance(Act.content, dict))
+                            if Act.content.keys==['keyring'] and login.URL is not None:
+                                logging.debug(f"sending {login.URL, Act.content['keyring'], self.keyringBackend} to keymanager")
+                                x=KeyManager(login.URL, Act.content['keyring'], self.keyringBackend)
+                                backend.Text(Act.id, x.key_access())
+                            elif Act.content.keys==['keyring']:
+                                self.logger.critical("To use a Keyring you must specify a URL")
+                                raise ValueError
+                            elif Act.content.keys==['value']:
+                                backend.Text(Act.id, str(Act.content)) #need to parse and see if its a thing
+                        case "move":
+                            self.logger.debug(f"sending [{Act.type}] action to backend [{backend.__class__.__name__}]")
+                            assert(isinstance(Act.id, dict))
+                            backend.Move(Act.id)
+                        case _:
+                            self.logger.critical("An Unexpected Error Occured Please report this!!! CODE: 1") #should never reach this critical error occurs if it does somehow
+                            raise Exception
+            except AssertionError as AE:
+                self.logger.critical("An Unexpected error occured CODE: 3"+str(AE)) 
+                        
+            
+    def _findURL(self) -> str:
+        """
+        internal method of Orchestrator, used to query if a CaptivePortal exists in the current network, if none is detected we will error out and exit the program
+
+        """
+        test: CaptiveDetector
+        try:
+            test=CaptiveDetector()
+        except CaptiveNotImplemented as cni:
+            self.logger.info(cni)
+            exit() #since there is no Captive portal there is nothing to do
+        captiveURL=test.CaptivePortalURL
+        #Returns a captive portal url to the terminal
+        logging.debug(f"CaptivePortalURL is {captiveURL}")
+        return(captiveURL)
+        
     def _backendCheck(self, name: str) -> None:
-        """
-        internal method of Orchestrator, used exclusively by backendBuilder
-        to see if the supplied backend is a backend listed in compatable backends
-        """
-        if name not in self.backends.keys():
-            raise ValueError(f"Bad backend: '{name}'")
+            """
+            internal method of Orchestrator, used exclusively by backendBuilder
+            to see if the supplied backend is a backend listed in compatable backends
+            """
+            if name not in self.backends.keys():
+                raise ValueError(f"Bad backend: '{name}'")
         
     def _backendBuilder(self, backendOverride : None | str = None) -> backend:
         """
@@ -70,6 +154,7 @@ class Orchestrator():
         
        # print(backedobj)
         return backedobj
+    
     def _Reader(self, filepath: str) -> LoginParser._ingest:
         """
         Internal method of Orchestrator, 
@@ -90,9 +175,13 @@ class Orchestrator():
             raise OSError(f"Error, The path [{path}] is invalid, or permissions dont permit access")
         #try to filter out some of the junk that may inevitably enter the directory
         loginfiles=(loginfiles for loginfiles in os.listdir(path) if loginfiles.endswith(".toml")) 
+        
+        #Test for the presence of a Captive Portal and return its url if present
+        captiveURL=self._findURL()
+
         for lFile in loginfiles:
-            try:
-                self._Reader(path+"/"+lFile)
+            try: #sent to multipledispatch for further parsing and dispatching to backends
+                self.Dispatch(self._Reader(path+"/"+lFile), captiveURL)
             except TOMLDecodeError as de:
                 self.logger.warn(f"The file {lFile} has a invalid toml format \n skipping ...")
             except UnicodeDecodeError as ude:
@@ -104,19 +193,29 @@ class Orchestrator():
             except Exception as e: 
                 self.logger.error(f"Unknown error: {str(e)} \n skipping ...")
             #next design a function that relegates actions etc. #and one that reads the url and compares it to the captive portal url
+            
+
 
     def _URL(self) -> None:
-        self._backendBuilder()
-    def _Layout(self) -> None:
-        self._backendBuilder()
+        x=self._findURL()
+        logging.debug(f"CaptivePortalURL is {x}")
+        print(x)
+
+    def _Layout(self, layout: str) -> None:
+        back=self._backendBuilder()
+        #needs to be supplied a url 
+        back.Layout_Fetch(layout)
+
     def _default(self) -> None:
         filepath=self.modes["default"]
+        captiveURL=self._findURL()
         try:
             session=LoginParser(filepath)
         except OSError:
             raise OSError(f"Error, the filepath is invalid or permissions dont permit read access")
-        
         self._backendBuilder()
+        self.Dispatch(self._Reader(filepath), captiveURL)
+    
     def relay(self) -> None:
         """
         Function of orchestrator that parses arguments and activates the appropriate member functions. 
@@ -126,19 +225,19 @@ class Orchestrator():
         """
         #temp for testing
        
-        if self.modes["verbose"]==True:
+        if "verbose" in self.modes:
             pass
-        if self.modes["Remove"]!=False:
+        if "Remove" in self.modes:
             self._Remove()
-        elif self.modes["Auto"]!=False:
+        elif "Auto" in self.modes:
             if self.modes["Auto"] is None:
                 self._Auto(self.loginFilesDir)
             else: #If there was a directory redirect supplied
                 self._Auto(self.modes["Auto"])
-        elif self.modes["URL"]!=False:
+        elif "URL" in self.modes:
             self._URL()
-        elif self.modes["Layout"]!=False:
-            self._Layout()
+        elif "Layout" in self.modes:
+            self._Layout(self.modes["Layout"])
         else:
             self._default()
        

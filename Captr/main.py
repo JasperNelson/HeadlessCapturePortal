@@ -29,7 +29,7 @@ def Intake(pargs: Optional[List[str]] = None) -> argparse.Namespace:
         )
     argparser.add_argument(
         'default',
-        nargs=1,
+        nargs="?",
         type=str,
         help="Verbose flag that will output the logs to the shell that the program was called from" 
         "Wont work if logging is disabled in the config"
@@ -70,7 +70,7 @@ def Intake(pargs: Optional[List[str]] = None) -> argparse.Namespace:
     argparser.add_argument(
         '-y', '--yes',
         action='store_true',
-        help="for use with -A/--Auto, will stop asking to use a config file to log into a network"    
+        help="for use wit h -A/--Auto, will stop asking to use a config file to log into a network"    
         )
     args= argparser.parse_args() if pargs is None else argparser.parse_args(pargs)
     return args
@@ -78,6 +78,7 @@ def Intake(pargs: Optional[List[str]] = None) -> argparse.Namespace:
     # argparser.add_argument('-G', '--Guided', help="Flag that will try to guide the user through a login session with choices and everything")
 # Use this when logging into the network
 ToUse=Intake()
+#print(vars(ToUse))
 readLoggingConfig()
 #logging.basicConfig(filename='myapp.log', level=logging.INFO)
 Orchestrator(ToUse)

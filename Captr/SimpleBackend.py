@@ -12,6 +12,9 @@ class SimpleBackend(backend):
     def Layout_Fetch(self, URL: str) -> str:
         print(f"URL:{URL}")
         return "simple"
+    def Start(self, URLstart: str | None ) -> bool: #default url if given
+        print(f"Move action -> URLstart:{URLstart}")
+        return True
     def Move(self, locator: dict) -> bool:
         print(f"Move action -> locator:{locator}")
         return True
