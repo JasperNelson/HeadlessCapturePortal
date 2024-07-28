@@ -77,7 +77,7 @@ def Intake(pargs: Optional[List[str]] = None) -> argparse.Namespace:
     #ROADMAPPED: Not yet implemented: 
     # argparser.add_argument('-G', '--Guided', help="Flag that will try to guide the user through a login session with choices and everything")
 # Use this when logging into the network
-ToUse=Intake()
+ToUse=Intake(["--Auto"])
 #print(vars(ToUse))
 readLoggingConfig()
 #logging.basicConfig(filename='myapp.log', level=logging.INFO)

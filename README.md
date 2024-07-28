@@ -1,6 +1,6 @@
 # Headless Capture Portal
 ## Architecture
-!["TOML Capture Portal Diagram"](./images/TOML-Capture-Architecture.png)
+
 * Major Classes:
     * `WebLogin`: Attempts to log into captive portal given a set of settings and actions
     * `LoginParser.Ingest`: Named tuple.
@@ -9,7 +9,8 @@
     * `LoginParser`: Takes a toml file path, reads a toml file from the given path, and creates a Ingest NamedTuple containing settings and actions.
     * `Config`: Takes a toml file path, reads a toml file from the given path, and creates a Ingest NamedTuple containing Configuration information
     * `KeyManager`: Manages keys from the current operating systems keyring.
-    * `CLIintake`: Reads command line flags from user and returns toml file.
+    * `main`: Reads command line flags from user and returns toml file.
+    * `Orchestrator`: The "meat" of the program orchestrator is a class that takes inputs and sends them to the backends.
     * Unit Tests: pytest files excercising objects above
 
 ### Current Login File Specification:
@@ -43,15 +44,14 @@
 
 - **General Click**:
   - Action: `click`
-  - Description: Clicks on elements specified by ID, XPath, name, or type.
-  - ID: Supports regular expressions. Unique identifier.
-    - Example: `id="example"`
-  - XPath: Targets elements using their XPath.
-    - Example: `x-path="/html/body/div/div/main/div/p[81]"`
-  - Name: Targets elements by their name attribute on the webpage.
-    - Example: `name="examplename"`
-  - Type: Targets elements by their type attribute.
-    - Example: `type="checkbox"`
+  - Description: Clicks on elements specified by ID, name, or type.
+  - **Identifiers:** (you can only have one of these)
+    - ID: Supports regular expressions. Unique identifier.
+      - Example: `id="example"`
+    - Name: Targets elements by their name attribute on the webpage.
+      - Example: `name="examplename"`
+    - Type: Targets elements by their type attribute.
+      - Example: `type="checkbox"`
 
 ### Wait Action
 
@@ -67,8 +67,9 @@
   - Action: `text`
   - Description: Enters text into a field. If `value` is not specified, the user will be prompted.
   - Name: The name attribute of the input field.
-  - Value: The text to enter. Optional.
-    - Example: `name="name", value="examplestringEGUserName"`
+  - **"Enterables":** 
+    - Value: The text to enter. Optional.
+      - Example: `name="name", value="examplestringEGUserName"`
 
 #### Secure Text Entry
 - **Password Input**:
@@ -96,9 +97,6 @@
 - <span style="color: red; font-weight: bold; background-color: black;">It is highly recommended NOT to store passwords in plaintext. Use the keyring options provided for secure password management.</span>
 - Ensure that your configuration aligns with the network and operational requirements specified in this document.
 
-
-
-
 #### FOR DEVELOPERS
 * Environment Setup:
     * use anaconda \\ disclaimer we are not affiliated with Anaconda in any way.
@@ -119,11 +117,21 @@
 3. [x] ~~Define a safe way to store and process passwords~~
 4. [ ] Define a module that verifies that a capture portal actually exists on the network and that it meets the specifications defined in the `Login` files.
 5. [x] ~~Define an extensible configuration file format~~
-6. [ ] Finish "Quick" frontend (all the commands that cause an immediate action)
-7. [ ] Setup Unit Tests 
-8. [ ] Develop Modular and Actionable Network Portion of Backend using requests that will take commands from the frontend. HOWEVER ensure that we are creating a good api that can be expanded on by additional installable packages/modules. (i.e [Playwrite](https://playwright.dev/python/docs/intro)) 
+6. [x] Finish "Quick" frontend (all the commands that cause an immediate action)
+7. [ ] Setup the Auto login to automatically login to a captive portal from a matching given url
+8. [ ] Setup Unit Tests 
+9. [ ] Develop Modular and Actionable Network Portion of Backend using requests that will take commands from the frontend. HOWEVER ensure that we are creating a good api that 
+can be expanded on by additional installable packages/modules. (i.e [Playwrite](https://playwright.dev/python/docs/intro)) 
+10. [x] Develop Debug Backend
+11. [ ] Setup the yes command to bypass questions
+12. [ ] Setup verbose command to automatically enable verbose logging
+13. [ ] Setup Layout command to automatically return the layout of a URL. 
+14. [ ] Setup Default command to login using a single given login toml file
+15. [-] Setup The Auto command to login using a directory of files contained in the config or manually specified
+16. [x] Setup the URL command to return the captive portal
 ##### FOR 2.0
-9. [ ] Add Playwrite Support
-10. [ ] Create a Intuitive TUI that will guide a user in creating a TOML Login file for a given network. 
+1. [ ] Add Playwrite Support
+2. [ ] Create a Intuitive TUI that will guide a user in creating a TOML Login file for a given network. 
+3. [ ] Allow for specification of Automatic Login by SSID and IP addresses. (as opposed to just URL) 
 ##### FAR FUTURE
-11. [ ] Port portions of program to GOLANG/RUST????
+1. [ ] Port portions of program to GOLANG/RUST????

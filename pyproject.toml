@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "HeadlessCaptr"
-version = "0.0.4"
+version = "0.0.4vB"
 requires-python = ">=3.11"
 description = "A tool for logging into any capture portals securely on headless systems. Also can be used for Automation"
 authors = [{name="Jasper Nelson", email = "jnelsons532@gmail.com"}, {name="Daniella", email="Daniellagallegos22@gmail.com"}]

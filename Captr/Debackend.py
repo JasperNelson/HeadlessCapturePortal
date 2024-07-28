@@ -8,7 +8,7 @@ class DebugBackend(backend):
         print(f"This is layout_fetch we recieved the :{URL}")
         return "simple"
     def Start(self, URLstart: str | None ) -> bool: #default url if given
-        print(f"Move action -> URLstart:{URLstart}")
+        print(f"Starting process -> URLstart:{URLstart}")
         return True
     def Move(self, locator: dict) -> bool:
         print(f"Move action -> locator:{locator}")

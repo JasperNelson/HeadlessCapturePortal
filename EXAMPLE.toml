@@ -1,6 +1,6 @@
 [NETWORK]
-#if set, will cause an error to occur if the SSID does not match 
-SSID="examplewifi" 
+
+URL="http://192.168.52.1:8083/FreeUam"
 #overrides the default starting URL for the capture portal. 
 #URL="https://example.com" #IMPORTANT: Additionally this is (needed for keyring functionality)
 # if set will change the backend to be used, needs to be one of the supported backends look at backends in readme

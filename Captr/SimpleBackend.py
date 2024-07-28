@@ -5,15 +5,12 @@ from Captr.LoginParser import Action, LoginParser
 from typing import NamedTuple
 #NOTE: right now this is simply a copy of DebugBackend! the real simplebackend will be implemented later. 
 class SimpleBackend(backend):
-    
-    def URL_Fetch(self, URL: str, config: NamedTuple) -> str:
-        print(f"URL:{URL}"+f"\n config:{config}")
-        return "simple"
+
     def Layout_Fetch(self, URL: str) -> str:
-        print(f"URL:{URL}")
+        print(f"This is layout_fetch we recieved the :{URL}")
         return "simple"
     def Start(self, URLstart: str | None ) -> bool: #default url if given
-        print(f"Move action -> URLstart:{URLstart}")
+        print(f"Starting process -> URLstart:{URLstart}")
         return True
     def Move(self, locator: dict) -> bool:
         print(f"Move action -> locator:{locator}")

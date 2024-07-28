@@ -1,4 +1,5 @@
-LoginFilesDir="/"
+LoginFilesDir="/Users/Jasper/Pictures/Screenshots/test/Loginfiles"
+#LoginFilesDir="/" # will error out (unless for some unholy reason you have a toml file at root level
 #turns on or off asking to log in with a toml file 
 PromptForSafety=true
 Logging=true # turns on logging
