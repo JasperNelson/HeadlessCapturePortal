@@ -10,7 +10,7 @@ from Captr.Debackend import DebugBackend
 from Captr.SimpleBackend import SimpleBackend
 import logging
 from Captr.keystorer import KeyManager
-from CaptiveDetect import CaptiveDetector, CaptiveNotImplemented
+from Captr.CaptiveDetect import CaptiveDetector, CaptiveNotImplemented
 from typing import NamedTuple
 
 
