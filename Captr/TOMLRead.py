@@ -1,6 +1,7 @@
 import tomllib as toml
 from typing import IO, cast
 
+
 def TOMLRead(f: IO[bytes] | str) -> dict:
     """
     Simple function that Opens Toml Files saves them to a variable and then returns whats in them
@@ -13,9 +14,9 @@ def TOMLRead(f: IO[bytes] | str) -> dict:
     """
     tml: dict
     try:
-        if type(f) == str:
+        if type(f) is str:
             with open(f, "rb") as inputFile:
-                 tml=toml.load(inputFile)
+                tml = toml.load(inputFile)
         else:
             tml = toml.load(cast(IO[bytes], f))
     except UnicodeDecodeError as err:
@@ -26,5 +27,5 @@ def TOMLRead(f: IO[bytes] | str) -> dict:
     except FileNotFoundError:
         raise FileNotFoundError("Cannot Find the File, Ensure the file path is correct and the file exits")
     except PermissionError:
-            raise PermissionError("Unable to reach the file due to Permission")          
+        raise PermissionError("Unable to reach the file due to Permission")          
     return tml

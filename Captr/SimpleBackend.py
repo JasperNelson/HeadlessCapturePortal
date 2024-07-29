@@ -4,19 +4,21 @@ from Captr.ConfigParser import Config
 from Captr.LoginParser import Action, LoginParser
 from typing import NamedTuple
 #NOTE: right now this is simply a copy of DebugBackend! the real simplebackend will be implemented later. 
+
+
 class SimpleBackend(backend):
 
     def Layout_Fetch(self, URL: str) -> str:
         print(f"This is layout_fetch we recieved the :{URL}")
         return "simple"
-    def Start(self, URLstart: str | None ) -> bool: #default url if given
+    def Start(self, URLstart: str | None) -> bool:  #default url if given
         print(f"Starting process -> URLstart:{URLstart}")
         return True
     def Move(self, locator: dict) -> bool:
         print(f"Move action -> locator:{locator}")
         return True
     def Text(self, locator: dict, value: str) -> bool:
-        print(f"Text insert action -> locator:{locator}"+
+        print(f"Text insert action -> locator:{locator}"
               f"\n->value:{value}")
         return True
     def Wait(self, Timespan: int) -> bool:
