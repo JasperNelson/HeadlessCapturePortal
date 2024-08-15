@@ -4,6 +4,9 @@
   formatters: {
     simple: {
       format: "%(levelname)-8s - %(message)s"
+    },
+    complex: {
+      format: "%(levelname)-8s | %(asctime)s | PID=%(process)d | %(filename)s:%(lineno)s [%(name)s]: %(message)s"
     }
   },
   handlers: {

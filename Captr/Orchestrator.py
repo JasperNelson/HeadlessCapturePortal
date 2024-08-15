@@ -7,7 +7,7 @@ from Captr.ConfigParser import Config
 from Captr.LoginParser import LoginParser
 from Captr.backend import backend
 from Captr.Debackend import DebugBackend
-from Captr.SimpleBackend import SimpleBackend
+from Captr.PlaywrightBackend import PlayWrightBackend
 import logging
 from Captr.keystorer import KeyManager
 from Captr.CaptiveDetect import CaptiveDetector, CaptiveNotImplemented
@@ -21,7 +21,7 @@ class Orchestrator():
         self.logger.debug(f"source modes={modes}")
         self.modes = self._namespaceToModes(modes)
         self.logger.debug(f"parsed modes={self.modes}")
-        self.backends = {"Debug": DebugBackend, "Simple": SimpleBackend}
+        self.backends = {"Debug": DebugBackend, "Playwright": PlayWrightBackend}
         self.config = Config("./CONFIG.toml")
         self.logger.debug(f"Config Vars={self.config.export}")
         #backend used unless if specified differently in a config
@@ -44,7 +44,7 @@ class Orchestrator():
         for later parsing. (It will remove all the options not used)
         where False = the option was not used
         """
-        result: dict ={}
+        result: dict = {}
         #Argparse.Namespace always has the keys contained in the result 
         #regardless of if they were used or not so we are going to parse if they were used or not.
         if modes.verbose is not False:
@@ -94,8 +94,8 @@ class Orchestrator():
                             else: 
                                 self.logger.critical("An Unexpected Error Occured Please report this!!! CODE: 2")
                         case "text":
-                            # self.logger.debug(f"sending [{Act.type}] action to backend [{backend.__class__.__name__}]")
-                            # self.logger.debug(f"Act.id={Act.id}"+f"\nAct.content={Act.content}")
+                            self.logger.debug(f"sending [{Act.type}] action to backend [{backend.__class__.__name__}]")
+                            self.logger.debug(f"Act.id={Act.id}" + f"\nAct.content={Act.content}")
 
                             assert (isinstance(Act.id, dict)) 
                             if Act.content is None:
@@ -133,7 +133,7 @@ class Orchestrator():
         """
         test: CaptiveDetector
         try:
-            test=CaptiveDetector()
+            test = CaptiveDetector()
         except CaptiveNotImplemented as cni:
             self.logger.info(cni)
             exit()  #since there is no Captive portal there is nothing to do

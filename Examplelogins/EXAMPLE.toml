@@ -1,17 +1,33 @@
 [NETWORK]
 
-URL="http://192.168.52.1:8083/FreeUam"
+URL="example.com"
 #overrides the default starting URL for the capture portal. 
 #URL="https://example.com" #IMPORTANT: Additionally this is (needed for keyring functionality)
 # if set will change the backend to be used, needs to be one of the supported backends look at backends in readme
 Backend="Debug"
 
+#Section 1: Clicks, Clicks an element on a webpage
+
+#Supports identifiers:
+# contains
+# name
+# type
+    # - Supported types
+    # checkbox
+    # searchbox
+    # button
+    # spinbutton
+    # textbox
+# xpath
+# id
 
 [[ACTION]] #ID is unique
 action="click"
 id="example" #ID supports regular expressions
 
-
+[[ACTION]] #Uses a text filter that will grab any matching elements and "click" them if possible (note this is not compatible with simplebackend
+action="click"
+contains="garply thud"
 
 
 [[ACTION]] #IMPORTANT: can select many (as there can be many with name)
@@ -25,19 +41,45 @@ action="click"
 #the type of the respective element(s) that you desire to select 
 type="checkbox"
 
+
+[[ACTION]] #selects element(s) matching the xpath
+action="click"
+#the xpath 
+xpath='//*[@id="localaccount_login"]'
+
+
+
+
+
+#Section 2: Wait, will wait a designated amount of time 
+
 [[ACTION]]
 action="wait"
 wait=30 #will wait 30 seconds before proceeding
 
+
+
+
+
+
+#Section 3: Text, will type a value into a identified textbox identifiers are the same as click
+
+#Supports identifiers:
+# contains
+# name
+# type
+# xpath
+# id
+
 [[ACTION]]
 action="text" # will enter text into a field or value
-name="name"
+name="exname"
 #string to automatically enter into the field.
 #if not present will prompt the user for one
 
 [[ACTION]]
 action="text" # will enter text into a field or value
-name="name"
+xpath="xpath"
 #string to automatically enter into the field.
 #if not present will prompt the user for one
 value="examplestringEGUserName"
@@ -46,13 +88,24 @@ value="examplestringEGUserName"
 # Its highly recommended not to store passwords in plaintext!!!
 [[ACTION]]  
 action= "text"
-name = "password"
-#when this is set it will utilize your operating systems keyring to securely store and access a password for a given username
+xpath = "xpath"
+#when the following is set it will utilize your operating systems keyring to securely store and access a password for a given username
 #By default, it will automatically choose a backend, however you can manually specify one in the config
 keyring="YourUserName"  
 
 
 
+
+
+
+#Section 4: Move, will directly move to a url given a URI or the id or xpath of an element containing a URI
+
+#Supports identifiers:
+# xpath: the xpath of an element
+# href: a URL
+# id: the id of an element
+
+#Move only supports the identifiers href_url, id, and xpath
 [[ACTION]]
 #moves to a new page with a specified href by the href url
 action= "move"

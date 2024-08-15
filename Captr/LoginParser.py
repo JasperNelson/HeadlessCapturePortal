@@ -134,22 +134,23 @@ class LoginParser():
              errors
             """
             # allowed Identification values that are compatable with every action type
-            self.t_identify_all = ["id", "name", "type"]
-            # extra allwed ID value for move
+            self.t_identify_all = ["id", "xpath"]
+            self.click_type = ["type", "contains", "name"] + self.t_identify_all
+            # extra allwed ID value for move"
             self.t_identify_move = self.t_identify_all + ["href"]
             # valid set values for text
             self.t_choice_text = ["value", "keyring"]
 
         # identifies the key type being used as well as if there is only 1 of them.
-        def identifytest(self, action: dict, method: list) -> str:
-            numberOfId = sum(int(key in action.keys()) for key in method)
+        def identifytest(self, action: dict, methodOfId: list) -> str:
+            numberOfId = sum(int(key in action.keys()) for key in methodOfId)
             if 1 < numberOfId:
                 raise ValueError(
-                    "You can only supply one identifier for this action type")
+                    f"You can only supply one identifier for the action type in {action}")
             elif 1 > numberOfId:
                 raise ValueError(
-                    "you need to supply some form of identifier for this action type")
-            keytype = [str(TheKey) for TheKey in action if TheKey in method]
+                    f"no known identifier was included for the action{action}")
+            keytype = [str(TheKey) for TheKey in action if TheKey in methodOfId]
             return (keytype[0])
 
         def waittest(self, action: dict) -> str:
@@ -161,7 +162,7 @@ class LoginParser():
 
         def clicktest(self, action: dict) -> str:
             # tells us if there is an invalid combination of values
-            return (self.identifytest(action, self.t_identify_all))
+            return (self.identifytest(action, self.click_type))
 
         def texttest(self, action: dict) -> tuple:
             temp = sum(int(key in action.keys()) for key in self.t_choice_text)
@@ -176,7 +177,7 @@ class LoginParser():
                 valuetype = [
                     str(TheKey) for TheKey in action if TheKey in self.t_choice_text][0]
             # idtype, valuetype
-            return (self.identifytest(action, self.t_identify_all), valuetype)
+            return (self.identifytest(action, self.click_type), valuetype)
 
         def movetest(self, action: dict) -> str:
             return (self.identifytest(action, self.t_identify_move))
@@ -266,5 +267,5 @@ class LoginParser():
         self.filepath = filepath
         self.inges = self._loginparse()
 
-# v=LoginParser(r"EXAMPLE.toml")
+# v = LoginParser(r"EXAMPLE.toml")
 # print(v.export)

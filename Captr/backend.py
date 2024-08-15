@@ -9,7 +9,7 @@ class backend(ABC):
         pass
 
     @abstractmethod
-    def Start(self, URLstart: str | None) -> bool:  # default url if given
+    def Start(self, URLstart: str) -> bool:  # default url if given
         pass
 
     @abstractmethod
