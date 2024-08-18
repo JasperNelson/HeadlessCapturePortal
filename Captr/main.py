@@ -3,6 +3,7 @@ import argparse
 from Captr.Orchestrator import Orchestrator
 from typing import Optional, List
 from Captr.LoggingRead import readLoggingConfig
+import logging
 
 
 # This goes into the help page
@@ -79,9 +80,11 @@ def Intake(pargs: Optional[List[str]] = None) -> argparse.Namespace:
     # argparser.add_argument('-G', '--Guided', help="Flag that will try to guide the user through a login session with 
     # choices and everything")
 # Use this when logging into the network
-ToUse = Intake(["--Auto"])
+ToUse = Intake()
 # print(vars(ToUse))
 readLoggingConfig()
+if ToUse.verbose is not False:
+    logging.getLogger(None).setLevel("DEBUG")
 # logging.basicConfig(filename='myapp.log', level=logging.INFO)
 Orchestrator(ToUse)
 # conf=Config(filepath=str(os.environ["HOME"]+"/.LoginFiles")) #Would have been created during the initial setup

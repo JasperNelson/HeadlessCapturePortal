@@ -11,12 +11,12 @@ from Captr.PlaywrightBackend import PlayWrightBackend
 import logging
 from Captr.keystorer import KeyManager
 from Captr.CaptiveDetect import CaptiveDetector, CaptiveNotImplemented
+import keyring as ky
 
 
 class Orchestrator(): 
     def __init__(self, modes: argparse.Namespace):
         #prep
-        #print(vars(modes))
         self.logger = logging.getLogger(__name__)
         self.logger.debug(f"source modes={modes}")
         self.modes = self._namespaceToModes(modes)
@@ -29,7 +29,6 @@ class Orchestrator():
         self.loginFilesDir = self.config.export.loginFilesDir
         self.keyringBackend = self.config.export.keyringBackend if self.config.export.keyringBackend != "" else None
         #will be None if "" in the config
-    #     print(self.defaultBackend)
         #start parsing options and split
         self.relay()
 
@@ -165,7 +164,6 @@ class Orchestrator():
         self._backendCheck(bFlag)
         backedobj = self.backends[bFlag]()
     
-        # print(backedobj)
         return backedobj
     
     def _Reader(self, filepath: str) -> LoginParser._ingest:
@@ -178,9 +176,17 @@ class Orchestrator():
         assert isinstance(ingest, LoginParser._ingest)
         return (ingest)
     
-    def _Remove(self) -> None:
+    def _Remove(self, lfile: str) -> None:
+        self.logger.debug("Started Parsing In Remove Password Mode")
+        try:
+            login = self._Reader(lfile)
+        except OSError:
+            raise OSError("Error, the filepath is invalid or permissions dont permit read access")
         #TODO: Doesnt use a backend as it uses keystorer instead
-        pass
+        for Act in login.Actions:        
+            if Act.type == "text" and isinstance(Act.content, str):
+                if 'keyring' in Act.content:
+                    ky.delete_password(f"HLessCapturePortal_{login.URL}", Act.content['keyring'])
 
     def _Auto(self, path: str) -> None:
         self.logger.debug("Started Parsing In Automatic Mode")
@@ -202,9 +208,9 @@ class Orchestrator():
                 self.logger.warn(f"Something was wrong with the formatting of the toml file {lFile}, Error = {ve} \n" 
                                  "skipping ...")
             except PermissionError:
-                self.logger.warn(f"Permissions do not allow reading the file {lFile} \n skipping ...")
+                self.logg er.warn(f"Permissions do not allow reading the file {lFile} \n skipping ...")
             except Exception as e: 
-                self.logger.error(f"Unknown error: {str(e)} \n skipping ...")
+                self.logger.error(f"Unexpected error: {str(e)} \n skipping ...")
             #next design a function that relegates actions etc. #and one that reads the url and compares it to the 
             #captive portal url
         if len(list(loginfiles)) == 0:
@@ -215,21 +221,32 @@ class Orchestrator():
         logging.debug(f"CaptivePortalURL is {x}")
         print(x)
 
-    def _Layout(self, layout: str) -> None:
+    def _Layout(self, url: str) -> None:
         back = self._backendBuilder()
         #needs to be supplied a url 
-        back.Layout_Fetch(layout)
+        back.Layout_Fetch(url)
 
     def _default(self) -> None:
         filepath = self.modes["default"]
         captiveURL = self._findURL()
         try:
-            session = LoginParser(filepath)
+            LoginParser(filepath)
         except OSError:
-            raise OSError(f"Error, the filepath is invalid or permissions dont permit read access")
+            raise OSError("Error, the filepath is invalid or permissions dont permit read access")
         self._backendBuilder()
-        self.Dispatch(self._Reader(filepath), captiveURL)
-    
+        try:
+            self.Dispatch(self._Reader(filepath), captiveURL)
+        except TOMLDecodeError:
+            self.logger.critical(f"The file {filepath} has a invalid toml format")
+        except UnicodeDecodeError:
+            self.logger.critical(f"The file {filepath} appears to be corrupted")
+        except ValueError as ve:
+            self.logger.critical(f"Something was wrong with the formatting of the toml file {filepath}, Error = {ve}")
+        except PermissionError:
+            self.logger.critical(f"Permissions do not allow reading the file {filepath}")
+        except Exception as e: 
+            self.logger.critical(f"Unexpected error: {str(e)}")
+
     def relay(self) -> None:
         """
         Function of orchestrator that parses arguments and activates the appropriate member functions. 
@@ -237,12 +254,8 @@ class Orchestrator():
         Arguments: 
         None
         """
-        #temp for testing
-        print("reached")
-        if "verbose" in self.modes:
-            pass
         if "Remove" in self.modes:
-            self._Remove()
+            self._Remove(self.modes["Remove"])
         elif "Auto" in self.modes:
             if self.modes["Auto"] is None:
                 self._Auto(self.loginFilesDir)

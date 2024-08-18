@@ -34,7 +34,7 @@
   loggers: {
   },
   root: {
-    level: "DEBUG",
+    level: "WARNING",
     handlers: [
       stderr,
       logfile
