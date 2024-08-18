@@ -4,7 +4,6 @@ import bitwarden_keyring  # bitwarden backend for keyring
 from typing import cast
 from getpass import getpass as gp
 from colorama import init, Fore
-import keyring as ky
 
 
 class KeyManager():

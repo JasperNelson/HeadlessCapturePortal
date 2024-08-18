@@ -49,7 +49,6 @@ class PlayWrightBackend(backend):
                 self.page.goto(locator["href"])
         return True
     def Text(self, locator: dict, value: str) -> bool:
-        print(f"Text insert action -> locator:{locator}" + f"\n->value:{value}")
         match list(locator.keys()):
             case ["type"]:
                 self.logger.debug(f"typing chars to the corresponding type:{locator["type"]}")

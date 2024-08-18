@@ -1,10 +1,22 @@
 [NETWORK]
 
+#Section 0: Network Settings
+# Network Settings contains two elements, one being 
+# URL which is the URL of your desired captive portal
+# Backend, which is the backend to be used. 
+
+
 URL="example.com"
 #overrides the default starting URL for the capture portal. 
 #URL="https://example.com" #IMPORTANT: Additionally this is (needed for keyring functionality)
 # if set will change the backend to be used, needs to be one of the supported backends look at backends in readme
 Backend="Debug"
+
+
+
+
+
+
 
 #Section 1: Clicks, Clicks an element on a webpage
 
@@ -45,7 +57,7 @@ type="checkbox"
 [[ACTION]] #selects element(s) matching the xpath
 action="click"
 #the xpath 
-xpath='//*[@id="localaccount_login"]'
+xpath='xpathere'
 
 
 

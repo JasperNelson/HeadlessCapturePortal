@@ -186,6 +186,7 @@ class Orchestrator():
         for Act in login.Actions:        
             if Act.type == "text" and isinstance(Act.content, str):
                 if 'keyring' in Act.content:
+                    logging.warn(f"deleting the password for{login.URL}{Act.content['keyring']}")
                     ky.delete_password(f"HLessCapturePortal_{login.URL}", Act.content['keyring'])
 
     def _Auto(self, path: str) -> None:
@@ -208,7 +209,7 @@ class Orchestrator():
                 self.logger.warn(f"Something was wrong with the formatting of the toml file {lFile}, Error = {ve} \n" 
                                  "skipping ...")
             except PermissionError:
-                self.logg er.warn(f"Permissions do not allow reading the file {lFile} \n skipping ...")
+                self.logger.warn(f"Permissions do not allow reading the file {lFile} \n skipping ...")
             except Exception as e: 
                 self.logger.error(f"Unexpected error: {str(e)} \n skipping ...")
             #next design a function that relegates actions etc. #and one that reads the url and compares it to the 

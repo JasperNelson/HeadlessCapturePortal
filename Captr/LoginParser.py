@@ -86,10 +86,8 @@ class LoginParser():
         Subclass of TOMLparser that defines a NamedTuple which is used for returning the value of the class
         """
         Actions: list[Action]  # forward reference
-        SSID: Optional[Optional[dict | None]] = None
         URL: Optional[str | None] = None
         Backend: Optional[str | None] = None
-        EnforceHTTPS: Optional[bool] = False
 
     def __init__(self, filepath: IO[bytes] | str) -> None:
         """
@@ -200,21 +198,14 @@ class LoginParser():
             toDo = []
             backend = None
             url = None
-            https = False
-            ssid = None
-
             v = self._var_test()
             for options in net:
                 try:
                     match str(options):
-                        case 'SSID':
-                            ssid = net[options]
                         case 'URL':
                             url = net[options]
                         case 'Backend':
                             backend = net[options]
-                        case 'EnforceHTTPS':
-                            https = bool(net[options])
                         case _:
                             raise ValueError("invalid option in network")
                 except ValueError:
@@ -254,7 +245,7 @@ class LoginParser():
                     raise KeyError(
                         "One of your steps is missing a action, identifier, or")
             self.export = self._ingest(
-                URL=url, EnforceHTTPS=https, Backend=backend, SSID=ssid, Actions=toDo)
+                URL=url, Backend=backend, Actions=toDo)
             return self.export
         else:
             raise ValueError(
@@ -267,5 +258,5 @@ class LoginParser():
         self.filepath = filepath
         self.inges = self._loginparse()
 
-# v = LoginParser(r"EXAMPLE.toml")
-# print(v.export)
+v = LoginParser(r"./Examplelogins/EXAMPLE.toml")
+print(v.export)

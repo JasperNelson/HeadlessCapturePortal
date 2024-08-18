@@ -1,7 +1,6 @@
 [NETWORK]
-SSID="examplewifi" 
 URL="https://example.com" 
-IP="1.0.0.1"
+
 
 [[ACTION]] 
 action="click"
