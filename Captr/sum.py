@@ -1,16 +1,16 @@
 from playwright import sync_api as sa
-import time
+
 
 with sa.sync_playwright() as d:
     browser = d.firefox.launch(headless=False)
+    print(type(browser))
     page = browser.new_page()
-    page.goto("https://splash.ironwifi.com/api/pages/2034/?mac=17:22:33:44:55:66&url=https://www.ironwifi.com&iwr=91d3cf2d9d95069ab2ca75180f1d7b3469b85b47&iwt=1723705876")
-    page.locator('input[name="plan37_quantity"]').fill("press_something")
-    time.sleep(20)
+    print(type(page))
+    # page.goto("https://splash.ironwifi.com/api/pages/2034/?mac=17:22:33:44:55:66&url=https://www.ironwifi.com&iwr=91d3cf2d9d95069ab2ca75180f1d7b3469b85b47&iwt=1723705876")
+    # page.locator('input[name="plan37_quantity"]').fill("press_something")
+    # time.sleep(20)
 
-
-
-### Works
+# Works
 
 # from playwright import sync_api as sa
 # import time

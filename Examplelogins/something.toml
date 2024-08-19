@@ -1,7 +1,7 @@
 
 [NETWORK]
 URL="http://192.168.52.1:8083/FreeUam"
-Backend="Playwright"
+Backend="f_Playwright"
 
 [[ACTION]]
 action="click"

@@ -9,7 +9,7 @@ id="example"
 
 [[ACTION]]
 action="click"
-x-path="/html/body/div/div/main/div/p[81]"
+xpath="/html/body/div/div/main/div/p[81]"
 #### WILL THROW ERROR CANNOT have more than 1
 id=""
 

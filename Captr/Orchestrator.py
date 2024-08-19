@@ -7,11 +7,17 @@ from Captr.ConfigParser import Config
 from Captr.LoginParser import LoginParser
 from Captr.backend import backend
 from Captr.Debackend import DebugBackend
-from Captr.PlaywrightBackend import PlayWrightBackend
+from Captr.PlaywrightBackend import ChromiumPlaywrightBackend, ChromiumVizPlaywrightBackend, FirefoxPlaywrightBackend
+from Captr.PlaywrightBackend import FirefoxVizPlaywrightBackend
 import logging
 from Captr.keystorer import KeyManager
 from Captr.CaptiveDetect import CaptiveDetector, CaptiveNotImplemented
 import keyring as ky
+
+
+class NonMatchingURL(Exception):
+    """Raised when the captive portal doesnt match the URL in a login file"""
+    pass
 
 
 class Orchestrator(): 
@@ -21,7 +27,9 @@ class Orchestrator():
         self.logger.debug(f"source modes={modes}")
         self.modes = self._namespaceToModes(modes)
         self.logger.debug(f"parsed modes={self.modes}")
-        self.backends = {"Debug": DebugBackend, "Playwright": PlayWrightBackend}
+        self.backends = {"Debug": DebugBackend, "f_Playwright": FirefoxPlaywrightBackend, 
+                         "c_Playwright": ChromiumPlaywrightBackend, "f_v_Playwright": FirefoxVizPlaywrightBackend, 
+                         "c_v_Playwright": ChromiumVizPlaywrightBackend}
         self.config = Config("./CONFIG.toml")
         self.logger.debug(f"Config Vars={self.config.export}")
         #backend used unless if specified differently in a config
@@ -31,11 +39,6 @@ class Orchestrator():
         #will be None if "" in the config
         #start parsing options and split
         self.relay()
-
-    def _LoginDirective(self, URL: str | None = None) -> None:
-        """
-        Internal method in Orchestrator that actually interfaces with the backends. 
-        """
 
     def _namespaceToModes(self, modes: argparse.Namespace) -> dict:
         """
@@ -53,7 +56,7 @@ class Orchestrator():
         if modes.URL is not False:
             result["URL"] = modes.URL  
         if modes.Layout is not None:
-            result["Layout"]=modes.Layout 
+            result["Layout"] = modes.Layout 
         if modes.Auto != '':
             result["Auto"] = modes.Auto  
         if modes.yes is not False:
@@ -70,59 +73,56 @@ class Orchestrator():
         internal method of Orchestrator, used to dispatch to a backend
         """
 
-        backend = self._backendBuilder(login.Backend) #activate and locate the proper backend
-        if not CaptiveURL.startswith(str(login.URL)): #checks if the supplied starting string is the same
-            self.logger.info(f"Captive Portal {CaptiveURL} doesnt start with {login.URL} skipping ...") 
-            raise (CaptiveNotImplemented)
-        else:
-            try:
-                ## Backend Initial Setup >>>
-                backend.Start(CaptiveURL) #used in session based backends other backends can just pass on the output
-                self.logger.debug(f"sending [{CaptiveURL}] Starting action to backend [{backend.__class__.__name__}]")
-                ## Backend actions >>>
-                for Act in login.Actions:
-                    match Act.type:
-                        case "click":
-                            self.logger.debug(f"sending [{Act.type}] action to backend [{backend.__class__.__name__}]")
-                            assert (isinstance(Act.id, dict))
-                            backend.Click(Act.id)
-                        case "wait":
-                            self.logger.debug(f"sending [{Act.type}] action to backend [{backend.__class__.__name__}]")
-                            if Act.wait is not None:
-                                backend.Wait(Act.wait)
-                            else: 
-                                self.logger.critical("An Unexpected Error Occured Please report this!!! CODE: 2")
-                        case "text":
-                            self.logger.debug(f"sending [{Act.type}] action to backend [{backend.__class__.__name__}]")
-                            self.logger.debug(f"Act.id={Act.id}" + f"\nAct.content={Act.content}")
+        backend = self._backendBuilder(login.Backend)  # activate and locate the proper backend
+        try:
+            ## Backend Initial Setup >>>
+            backend.Start(CaptiveURL)  #used in session based backends other backends can just pass on the output
+            self.logger.debug(f"sending [{CaptiveURL}] Starting action to backend [{backend.__class__.__name__}]")
+            ## Backend actions >>>
+            for Act in login.Actions:
+                match Act.type:
+                    case "click":
+                        self.logger.debug(f"sending [{Act.type}] action to backend [{backend.__class__.__name__}]")
+                        assert (isinstance(Act.id, dict))
+                        backend.Click(Act.id)
+                    case "wait":
+                        self.logger.debug(f"sending [{Act.type}] action to backend [{backend.__class__.__name__}]")
+                        if Act.wait is not None:
+                            backend.Wait(Act.wait)
+                        else: 
+                            self.logger.critical("An Unexpected Error Occured Please report this!!! CODE: 2")
+                    case "text":
+                        self.logger.debug(f"sending [{Act.type}] action to backend [{backend.__class__.__name__}]")
+                        self.logger.debug(f"Act.id={Act.id}" + f"\nAct.content={Act.content}")
 
-                            assert (isinstance(Act.id, dict)) 
-                            if Act.content is None:
-                                content = input(f"please provide the text to input into text for the corresponding value: {Act.id}") 
-                                self.logger.debug(f"sending [{Act.type}] action to backend [{backend.__class__.__name__}]")
-                                backend.Text(Act.id, str(content)) #need to parse and see if its a thing
-                            elif 'keyring' in Act.content and login.URL is not None:
-                                logging.debug(f"sending {login.URL, Act.content['keyring'], self.keyringBackend} to"
-                                              "keymanager")
-                                x = KeyManager(login.URL, Act.content['keyring'], self.keyringBackend)
-                                self.logger.debug(f"sending [{Act.type}] action to backend [{backend.__class__.__name__}]")
-                                backend.Text(Act.id, x.key_access())
-                            elif 'keyring' in Act.content:
-                                self.logger.critical("To use a Keyring you must specify a URL")
-                                raise ValueError
-                            elif 'value' in Act.content:
-                                self.logger.debug(f"sending [{Act.type}] action to backend [{backend.__class__.__name__}]")
-                                backend.Text(Act.id, str(Act.content['value'])) #need to parse and see if its a thing
-                        case "move":
+                        assert (isinstance(Act.id, dict)) 
+                        if Act.content is None:
+                            content = input(f"please provide the text to input into text for the corresponding value:"
+                                            f" {Act.id}") 
                             self.logger.debug(f"sending [{Act.type}] action to backend [{backend.__class__.__name__}]")
-                            assert (isinstance(Act.id, dict))
-                            backend.Move(Act.id)
-                        case _:
-                            self.logger.critical("An Unexpected Error Occured Please report this!!! CODE: 1") 
-                            # should never reach this critical log,  error occurs if it does somehow
-                            raise Exception
-            except AssertionError as AE:
-                self.logger.critical("An Unexpected error occured CODE: 3", AE) 
+                            backend.Text(Act.id, str(content))  #need to parse and see if its a thing
+                        elif 'keyring' in Act.content and login.URL is not None:
+                            logging.debug(f"sending {login.URL, Act.content['keyring'], self.keyringBackend} to"
+                                          "keymanager")
+                            x = KeyManager(login.URL, Act.content['keyring'], self.keyringBackend)
+                            self.logger.debug(f"sending [{Act.type}] action to backend [{backend.__class__.__name__}]")
+                            backend.Text(Act.id, x.key_access())
+                        elif 'keyring' in Act.content:
+                            self.logger.critical("To use a Keyring you must specify a URL")
+                            raise ValueError
+                        elif 'value' in Act.content:
+                            self.logger.debug(f"sending [{Act.type}] action to backend [{backend.__class__.__name__}]")
+                            backend.Text(Act.id, str(Act.content['value']))  #need to parse and see if its a thing
+                    case "move":
+                        self.logger.debug(f"sending [{Act.type}] action to backend [{backend.__class__.__name__}]")
+                        assert (isinstance(Act.id, dict))
+                        backend.Move(Act.id)
+                    case _:
+                        self.logger.critical("An Unexpected Error Occured Please report this!!! CODE: 1") 
+                        # should never reach this critical log,  error occurs if it does somehow
+                        raise Exception
+        except AssertionError as AE:
+            self.logger.critical("An Unexpected error occured CODE: 3", AE) 
                                 
     def _findURL(self) -> str:
         """
@@ -140,15 +140,7 @@ class Orchestrator():
         #Returns a captive portal url to the terminal
         logging.debug(f"CaptivePortalURL is {captiveURL}")
         return (captiveURL)
-        
-    def _backendCheck(self, name: str) -> None:
-        """
-        internal method of Orchestrator, used exclusively by backendBuilder
-        to see if the supplied backend is a backend listed in compatable backends
-        """
-        if name not in self.backends.keys():
-            raise ValueError(f"Bad backend: '{name}'")
-    
+                   
     def _backendBuilder(self, backendOverride : None | str = None) -> backend:
         """
         internal method of Orchestrator, returns a useable backend object
@@ -156,15 +148,23 @@ class Orchestrator():
         #the flag used to identify the backend
         bFlag: str
         #the backend object
-        backedobj: backend
         if backendOverride is not None:
             bFlag = backendOverride
         else: 
             bFlag = self.defaultBackend
-        self._backendCheck(bFlag)
-        backedobj = self.backends[bFlag]()
-    
-        return backedobj
+        match bFlag:
+            case "Debug":
+                return DebugBackend()
+            case "f_Playwright":
+                return FirefoxPlaywrightBackend()
+            case "f_v_Playwright":
+                return FirefoxVizPlaywrightBackend()
+            case "c_Playwright":
+                return ChromiumPlaywrightBackend()
+            case "c_v_Playwright":
+                return ChromiumVizPlaywrightBackend()
+            case _:
+                raise ValueError(f"Bad backend: '{bFlag}'")
     
     def _Reader(self, filepath: str) -> LoginParser._ingest:
         """
@@ -177,6 +177,9 @@ class Orchestrator():
         return (ingest)
     
     def _Remove(self, lfile: str) -> None:
+        """
+        Internal method of Orchestrator used to remove the keyrings from a login file. 
+        """
         self.logger.debug("Started Parsing In Remove Password Mode")
         try:
             login = self._Reader(lfile)
@@ -190,6 +193,9 @@ class Orchestrator():
                     ky.delete_password(f"HLessCapturePortal_{login.URL}", Act.content['keyring'])
 
     def _Auto(self, path: str) -> None:
+        """ 
+        Internal method of orchestrator used to start the process of batch attempting loggons
+        """
         self.logger.debug("Started Parsing In Automatic Mode")
         if not os.path.exists(path):
             raise OSError(f"Error, The path [{path}] is invalid, or permissions dont permit access")
@@ -200,7 +206,19 @@ class Orchestrator():
 
         for lFile in loginfiles:
             try:  #sent to multipledispatch for further parsing and dispatching to backends
-                self.Dispatch(self._Reader(path + "/" + lFile), captiveURL)
+                login = self._Reader(path + "/" + lFile)
+                if not (captiveURL).startswith(str(login.URL)):  # checks if the supplied starting string is the same
+                    raise (NonMatchingURL)
+                elif "yes" in self.modes:
+                    self.Dispatch(login, captiveURL)
+                else:
+                    response = input(f"matching login file found do you want to try to login with {lFile}? \n"
+                                     "Y/n")
+                    if response.lower() == "y":
+                        self.Dispatch(login, captiveURL)
+                    else: 
+                        self.logger.info("Rejection Acknowledged, skipping ...")
+                       
             except TOMLDecodeError:
                 self.logger.warn(f"The file {lFile} has a invalid toml format \n skipping ...")
             except UnicodeDecodeError:
@@ -210,24 +228,32 @@ class Orchestrator():
                                  "skipping ...")
             except PermissionError:
                 self.logger.warn(f"Permissions do not allow reading the file {lFile} \n skipping ...")
+            except NonMatchingURL:
+                #typical behavior no need for a warn
+                self.logger.info(f"Captive Portal {captiveURL} doesnt start with {login.URL} skipping ...")  
             except Exception as e: 
                 self.logger.error(f"Unexpected error: {str(e)} \n skipping ...")
             #next design a function that relegates actions etc. #and one that reads the url and compares it to the 
             #captive portal url
         if len(list(loginfiles)) == 0:
-            self.logger.error("The directory to search for login files doesn't contain any login files Exiting. . .")
+            self.logger.error("The directory to search for login files doesn't contain any login files Exiting ...")
 
     def _URL(self) -> None:
+        """internal Method of orchestrator used to return the current captiveportal url"""
         x = self._findURL()
         logging.debug(f"CaptivePortalURL is {x}")
         print(x)
 
     def _Layout(self, url: str) -> None:
+        """internal method of orchestrator used to fetch the layout of a page,
+        *Note: depending on the backend the results will vary"""
         back = self._backendBuilder()
         #needs to be supplied a url 
         back.Layout_Fetch(url)
 
     def _default(self) -> None:
+        """internal method of orchestrator used to initiate the logon process for a single file
+        """
         filepath = self.modes["default"]
         captiveURL = self._findURL()
         try:
@@ -236,7 +262,11 @@ class Orchestrator():
             raise OSError("Error, the filepath is invalid or permissions dont permit read access")
         self._backendBuilder()
         try:
-            self.Dispatch(self._Reader(filepath), captiveURL)
+            login = self._Reader(filepath)
+            if not (captiveURL).startswith(str(login.URL)):  # checks if the supplied starting string is the same
+                raise (NonMatchingURL)
+            else:
+                self.Dispatch(login, captiveURL)
         except TOMLDecodeError:
             self.logger.critical(f"The file {filepath} has a invalid toml format")
         except UnicodeDecodeError:
@@ -245,6 +275,8 @@ class Orchestrator():
             self.logger.critical(f"Something was wrong with the formatting of the toml file {filepath}, Error = {ve}")
         except PermissionError:
             self.logger.critical(f"Permissions do not allow reading the file {filepath}")
+        except NonMatchingURL:
+            self.logger.info(f"Captive Portal {captiveURL} doesnt start with {login.URL} skipping ...")
         except Exception as e: 
             self.logger.critical(f"Unexpected error: {str(e)}")
 
@@ -268,5 +300,3 @@ class Orchestrator():
             self._Layout(self.modes["Layout"])
         else:
             self._default()
-       
-

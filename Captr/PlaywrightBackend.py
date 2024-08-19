@@ -5,11 +5,13 @@ import time
 
 
 class PlayWrightBackend(backend):
+    """
+    Class that serves as a factory for all the PlayWrightBackends
+    """
     def __init__(self) -> None:
         self.logger = logging.getLogger(__name__)
-        self.browser = sa.sync_playwright().start().firefox.launch()
-        self.logger.debug("Initializing firefox browser instance")
-        self.page = self.browser.new_page()
+        self.browser : sa._generated.Browser
+        self.page : sa._generated.Page
 
     def _checker(self, value: str) -> bool:
         """checks the types of the values against a set value"""
@@ -104,3 +106,47 @@ class PlayWrightBackend(backend):
             case _:
                 pass
         return True
+    
+
+class FirefoxPlaywrightBackend(PlayWrightBackend):
+    def __init__(self) -> None:
+        """
+        Playwright Backend using Firefox
+        """
+        super().__init__()
+        self.browser = sa.sync_playwright().start().firefox.launch()
+        self.logger.debug("Initializing firefox browser instance")
+        self.page = self.browser.new_page()
+
+
+class FirefoxVizPlaywrightBackend(PlayWrightBackend):
+    """
+    Playwright Backend that will launch the Firefox browser in a non-headless mode
+    """
+    def __init__(self) -> None:
+        super().__init__()
+        self.browser = sa.sync_playwright().start().firefox.launch(headless=False)
+        self.logger.debug("Initializing firefox browser instance")
+        self.page = self.browser.new_page()
+
+
+class ChromiumPlaywrightBackend(PlayWrightBackend):
+    """
+    Playwright Backend using chromium
+    """
+    def __init__(self) -> None:
+        super().__init__()
+        self.browser = sa.sync_playwright().start().chromium.launch()
+        self.logger.debug("Initializing chromium browser instance")
+        self.page = self.browser.new_page()
+
+
+class ChromiumVizPlaywrightBackend(PlayWrightBackend):
+    """
+    Playwright Backend that will launch the Chromium browser in a non-headless mode
+    """
+    def __init__(self) -> None:
+        super().__init__()
+        self.browser = sa.sync_playwright().start().chromium.launch(headless=False)
+        self.logger.debug("Initializing chromium browser instance")
+        self.page = self.browser.new_page()
