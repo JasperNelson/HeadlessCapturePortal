@@ -1,0 +1,43 @@
+#Format for The logging
+{ 
+  version: 1,
+  formatters: {
+    simple: {
+      format: "%(levelname)-8s - %(message)s"
+    },
+    complex: {
+      format: "%(levelname)-8s | %(asctime)s | PID=%(process)d | %(filename)s:%(lineno)s [%(name)s]: %(message)s"
+    }
+  },
+  handlers: {
+    stdout: {
+      class: "logging.StreamHandler",
+ #     level: "DEBUG",
+      formatter: "simple",
+      stream: "ext://sys.stdout"
+    },
+    stderr: {
+      class: "logging.StreamHandler",
+      formatter: "simple",
+      stream: "ext://sys.stderr"
+    },
+
+    logfile: {
+      class: "logging.handlers.RotatingFileHandler", 
+      formatter: "simple", 
+      maxBytes: 20000000,
+      backupCount: 10,
+      filename: "../../captr.log",
+      mode: "w"
+    }
+  },
+  loggers: {
+  },
+  root: {
+    level: "WARNING",
+    handlers: [
+      stderr,
+      logfile
+    ]
+  },
+}

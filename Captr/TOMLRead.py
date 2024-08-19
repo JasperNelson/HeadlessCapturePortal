@@ -1,6 +1,7 @@
 import tomllib as toml
 from typing import IO, cast
 
+
 def TOMLRead(f: IO[bytes] | str) -> dict:
     """
     Simple function that Opens Toml Files saves them to a variable and then returns whats in them
@@ -11,20 +12,20 @@ def TOMLRead(f: IO[bytes] | str) -> dict:
     Returns:
         Returns a parsed TOML object.
     """
-    inputFile: IO[bytes] | str
-    if type(f) == str:
-        inputFile = cast(IO[bytes], open(cast(str, f), "rb"))
-    else:
-        inputFile = cast(IO[bytes], f)
-
-    with inputFile:
-        try:
-            tml = toml.load(inputFile)
-        except UnicodeDecodeError as err:
-            print("ERROR: Your TOML File Appears to be corrupted or your pointing to the wrong file")
-            raise err
-        except toml.TOMLDecodeError:
-            raise toml.TOMLDecodeError("Your TOML File Appears to have Formatting Errors")
-        except FileNotFoundError:
-            raise FileNotFoundError("Cannot Find the File, Ensure the file path is correct and the file exits")    
+    tml: dict
+    try:
+        if type(f) is str:
+            with open(f, "rb") as inputFile:
+                tml = toml.load(inputFile)
+        else:
+            tml = toml.load(cast(IO[bytes], f))
+    except UnicodeDecodeError as err:
+        print("ERROR: Your TOML File Appears to be corrupted or your pointing to the wrong file")
+        raise err
+    except toml.TOMLDecodeError:
+        raise toml.TOMLDecodeError("Your TOML File Appears to have Formatting Errors")
+    except FileNotFoundError:
+        raise FileNotFoundError("Cannot Find the File, Ensure the file path is correct and the file exits")
+    except PermissionError:
+        raise PermissionError("Unable to reach the file due to Permission")          
     return tml

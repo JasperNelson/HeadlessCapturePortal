@@ -1,0 +1,16 @@
+
+[NETWORK]
+URL="http://192.168.52.1:8083/FreeUam"
+Backend="f_Playwright"
+
+[[ACTION]]
+action="click"
+id="terms_service_cb"
+
+[[ACTION]]
+action="click"
+id="continue_btn"
+
+[[ACTION]]
+action="wait"
+wait=20
