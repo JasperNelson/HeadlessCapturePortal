@@ -12,7 +12,6 @@ from Captr.PlaywrightBackend import FirefoxVizPlaywrightBackend
 import logging
 from Captr.keystorer import KeyManager
 from Captr.CaptiveDetect import CaptiveDetector, CaptiveNotImplemented
-import keyring as ky
 
 
 class NonMatchingURL(Exception):
@@ -36,6 +35,7 @@ class Orchestrator():
         self.defaultBackend = self.config.export.defaultBackend
         self.loginFilesDir = self.config.export.loginFilesDir
         self.keyringBackend = self.config.export.keyringBackend if self.config.export.keyringBackend != "" else None
+        self.askToggle = self.config.export.safetyPrompt
         #will be None if "" in the config
         #start parsing options and split
         self.relay()
@@ -185,12 +185,12 @@ class Orchestrator():
             login = self._Reader(lfile)
         except OSError:
             raise OSError("Error, the filepath is invalid or permissions dont permit read access")
-        #TODO: Doesnt use a backend as it uses keystorer instead
-        for Act in login.Actions:        
+        for Act in login.Actions:
             if Act.type == "text" and isinstance(Act.content, str):
                 if 'keyring' in Act.content:
-                    logging.warn(f"deleting the password for{login.URL}{Act.content['keyring']}")
-                    ky.delete_password(f"HLessCapturePortal_{login.URL}", Act.content['keyring'])
+                    keyManage = KeyManager(f"HLessCapturePortal_{login.URL}", Act.content['keyring'],
+                                           self.keyringBackend)
+                    keyManage.key_removal()
 
     def _Auto(self, path: str) -> None:
         """ 
@@ -209,7 +209,7 @@ class Orchestrator():
                 login = self._Reader(path + "/" + lFile)
                 if not (captiveURL).startswith(str(login.URL)):  # checks if the supplied starting string is the same
                     raise (NonMatchingURL)
-                elif "yes" in self.modes:
+                elif "yes" in self.modes or self.askToggle is False:
                     self.Dispatch(login, captiveURL)
                 else:
                     response = input(f"matching login file found do you want to try to login with {lFile}? \n"

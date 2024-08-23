@@ -3,6 +3,7 @@ from typing import IO
 from Captr.TOMLRead import TOMLRead
 from Captr.LoginParser import LoginParser
 
+
 def test_toml_read() -> None:
     # Given
     bytesFile: IO[bytes] = BytesIO(b"""

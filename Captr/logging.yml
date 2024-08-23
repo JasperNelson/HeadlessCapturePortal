@@ -24,7 +24,7 @@
 
     logfile: {
       class: "logging.handlers.RotatingFileHandler", 
-      formatter: "simple", 
+      formatter: "complex", 
       maxBytes: 20000000,
       backupCount: 10,
       filename: "../../captr.log",

@@ -22,7 +22,7 @@ class Config():
             cls._instance = super(Config, cls).__new__(cls)
         return cls._instance
     
-    def __init__(self, filepath: str = "") -> None:
+    def __init__(self, filepath: IO[bytes] | str = "") -> None:
         if Type is IO[bytes]:
             self.filepath = filepath
         else:  

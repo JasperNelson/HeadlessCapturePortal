@@ -29,7 +29,8 @@ class CaptiveDetector:
       
     def PortalDetect(self) -> None:
         """
-        Method that returns a true or false depending on if a method exists or not
+        Method that returns a true or false depending on if a method exists or not as well as checks if the captive 
+        portal page is https
         """
         firstquery = self._session.head("http://ping.archlinux.org")
         self.resultcode = int(firstquery.status_code)
