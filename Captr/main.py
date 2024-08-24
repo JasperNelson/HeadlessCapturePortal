@@ -28,6 +28,13 @@ def Intake(pargs: Optional[List[str]] = None) -> argparse.Namespace:
         "Wont work if logging is disabled in the config"
     )
     argparser.add_argument(
+        '-i', '--ignore',
+        nargs=1,
+        type=str,
+        help="flag that will stop the captive portal detection by supplying a forced url."
+        "mainly supposed to be used for testing."
+    )
+    argparser.add_argument(
         'default',
         nargs="?",
         type=str,

@@ -52,7 +52,9 @@ class Orchestrator():
         if modes.verbose is not False:
             result["verbose"] = modes.verbose 
         if modes.Remove is not None:
-            result["Remove"] = modes.Remove  
+            result["Remove"] = modes.Remove
+        if modes.ignore is not False:
+            result['ignore'] = modes.ignore  
         if modes.URL is not False:
             result["URL"] = modes.URL  
         if modes.Layout is not None:
@@ -130,13 +132,16 @@ class Orchestrator():
         detected we will error out and exit the program
 
         """
-        test: CaptiveDetector
+        captiveURL: str
         try:
-            test = CaptiveDetector()
+            if "ignore" in self.modes:
+                captiveURL = CaptiveDetector().CaptivePortalURL
+            else:
+                captiveURL=self.modes["ignore"]
+
         except CaptiveNotImplemented as cni:
             self.logger.info(cni)
             exit()  #since there is no Captive portal there is nothing to do
-        captiveURL = test.CaptivePortalURL
         #Returns a captive portal url to the terminal
         logging.debug(f"CaptivePortalURL is {captiveURL}")
         return (captiveURL)
