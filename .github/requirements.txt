@@ -3,3 +3,6 @@ bitwarden-keyring
 typing
 mypy
 pytest
+pyyaml
+playwright
+pytest-playwright
