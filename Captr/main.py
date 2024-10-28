@@ -1,4 +1,6 @@
 # argument parsing
+import sys
+print(f"__name__='{__name__}'; sys.path={sys.path}")
 import argparse
 from Captr.Orchestrator import Orchestrator
 from typing import Optional, List
