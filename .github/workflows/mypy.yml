@@ -12,6 +12,8 @@ jobs:
         python-version: '3.12.2'
     - name: install requirements
       run: pip install -r requirements.txt
+    - name: install types
+      run: mypy --install-types
     - name: mypy 
       run: mypy ./Captr/
       
