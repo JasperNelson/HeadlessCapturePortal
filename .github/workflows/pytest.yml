@@ -13,7 +13,7 @@ jobs:
     - name: Build Testing Server
       run: docker buildx build -t dockernet:dockernet -f .github/DockerNet/Dockerfile .
     - name: Run Testing Server
-      run: cd .github/DockerNet && docker run -d -p 5000:5000 --name dockernet && cd ../..
+      run: cd .github/DockerNet && docker run -d -p 5000:5000 --name dockernet dockernet:dockernet && cd ../..
     - name: install requirements
       run: pip install -r requirements.txt
     - name: pytest run
