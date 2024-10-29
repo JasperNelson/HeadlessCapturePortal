@@ -1,6 +1,4 @@
 # argument parsing
-import sys
-print(f"__name__='{__name__}'; sys.path={sys.path}")
 import argparse
 from Captr.Orchestrator import Orchestrator
 from typing import Optional, List
@@ -85,15 +83,18 @@ def Intake(pargs: Optional[List[str]] = None) -> argparse.Namespace:
     args = argparser.parse_args() if pargs is None else argparser.parse_args(pargs)
     return args
 
+
+def main() -> None:
+    ToUse = Intake()
+    readLoggingConfig()
+    if ToUse.verbose is not False:
+        logging.getLogger(None).setLevel("DEBUG")
+    # logging.basicConfig(filename='myapp.log', level=logging.INFO)
+    Orchestrator(ToUse)
     # ROADMAPPED: Not yet implemented:
     # argparser.add_argument('-G', '--Guided', help="Flag that will try to guide the user through a login session with 
     # choices and everything")
 # Use this when logging into the network
-ToUse = Intake()
-# print(vars(ToUse))
-readLoggingConfig()
-if ToUse.verbose is not False:
-    logging.getLogger(None).setLevel("DEBUG")
-# logging.basicConfig(filename='myapp.log', level=logging.INFO)
-Orchestrator(ToUse)
-# conf=Config(filepath=str(os.environ["HOME"]+"/.LoginFiles")) #Would have been created during the initial setup
+if __name__ == "__main__":
+    main()
+    # conf=Config(filepath=str(os.environ["HOME"]+"/.LoginFiles")) #Would have been created during the initial setup

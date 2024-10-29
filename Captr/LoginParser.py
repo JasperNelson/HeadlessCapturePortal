@@ -32,6 +32,7 @@ class Action(NamedTuple):
     content: Optional[dict[str, str]] = None
     # only used in wait actions
     wait: Optional[int] = None
+    Print: Optional[bool] = None
 
 
 class LoginParser():
@@ -238,6 +239,10 @@ class LoginParser():
                             # creates action object and adds it to the list
                             toDo.append(
                                 Action('move', {idtype: action[idtype]}))
+                        case 'print':
+                            toDo.append(
+                                Action('Print', {"Print": "Print"})
+                            )
                         case _:
                             raise ValueError(
                                 f"missing And/or invalid action in action#{place}")

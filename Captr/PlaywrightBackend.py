@@ -72,7 +72,7 @@ class PlayWrightBackend(backend):
                 self.page.locator(f'xpath={str(locator["xpath"])}').press_sequentially(value)
             case ["id"]:
                 self.logger.debug(f"starting typing strings to id:{locator["id"]}")
-                self.page.locator(f"#{str(locator["id"])}").press_sequentially(value)
+                self.page.locator(f"input#{str(locator["id"])}").press_sequentially(value)
             case _:
                 pass
 
@@ -106,12 +106,15 @@ class PlayWrightBackend(backend):
             case _:
                 pass
         return True
-    
+    def PrintPage(self) -> str:
+        print(self.page.content())
+        return self.page.content()
+
 
 class FirefoxPlaywrightBackend(PlayWrightBackend):
     def __init__(self) -> None:
         """
-        Playwright Backend using Firefox
+        Playwright Backend using Firefox browser
         """
         super().__init__()
         self.browser = sa.sync_playwright().start().firefox.launch()

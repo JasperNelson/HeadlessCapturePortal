@@ -10,7 +10,7 @@ jobs:
    steps: 
    - uses: actions/checkout@v4
    - name: CD build
-     run: docker buildx build -t dockerarch -f .github/Dockerfile .
+     run: docker buildx build -t dockerarch -f .github/DockerArch .
    - name: Create Container
      run: cd .github && docker create --name dockerarch dockerarch
    - name: Save Docker Container

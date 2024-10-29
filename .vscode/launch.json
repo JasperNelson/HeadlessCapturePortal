@@ -20,8 +20,11 @@
             "type": "debugpy",
             "request": "launch",
             "program": "${file}",
-            "cwd": "C:\\Users\\Jasper\\Documents\\Workspace\\CaptrPortal" ,
-            "console": "integratedTerminal"
+            "cwd": "C:\\Users\\Jasper\\Documents\\Workspace\\CaptrPortal",
+            "console": "integratedTerminal",
+            "env": {
+            "PYTHONPATH": "C:\\Users\\Jasper\\Documents\\Workspace\\CaptrPortal"
+            }
         }
     ]
 }

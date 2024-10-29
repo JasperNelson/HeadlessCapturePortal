@@ -83,6 +83,9 @@ class Orchestrator():
             ## Backend actions >>>
             for Act in login.Actions:
                 match Act.type:
+                    case "Print":
+                        self.logger.debug("sending Print actgion to backend")
+                        backend.PrintPage()
                     case "click":
                         self.logger.debug(f"sending [{Act.type}] action to backend [{backend.__class__.__name__}]")
                         assert (isinstance(Act.id, dict))
@@ -134,10 +137,10 @@ class Orchestrator():
         """
         captiveURL: str
         try:
-            if "ignore" in self.modes:
+            if "ignore" not in self.modes:
                 captiveURL = CaptiveDetector().CaptivePortalURL
             else:
-                captiveURL=self.modes["ignore"]
+                captiveURL = self.modes["ignore"]
 
         except CaptiveNotImplemented as cni:
             self.logger.info(cni)
@@ -205,10 +208,11 @@ class Orchestrator():
         if not os.path.exists(path):
             raise OSError(f"Error, The path [{path}] is invalid, or permissions dont permit access")
         #try to filter out some of the junk that may inevitably enter the directory
-        loginfiles = (loginfiles for loginfiles in os.listdir(path) if loginfiles.endswith(".toml")) 
+        loginfiles = list(loginfiles for loginfiles in os.listdir(path) if loginfiles.endswith(".toml")) 
         #Test for the presence of a Captive Portal and return its url if present
         captiveURL = self._findURL()
-
+        if isinstance(captiveURL, list):
+            captiveURL = str(captiveURL[0])
         for lFile in loginfiles:
             try:  #sent to multipledispatch for further parsing and dispatching to backends
                 login = self._Reader(path + "/" + lFile)
@@ -223,21 +227,20 @@ class Orchestrator():
                         self.Dispatch(login, captiveURL)
                     else: 
                         self.logger.info("Rejection Acknowledged, skipping ...")
-                       
             except TOMLDecodeError:
-                self.logger.warn(f"The file {lFile} has a invalid toml format \n skipping ...")
+                self.logger.warning(f"The file {lFile} has a invalid toml format \n skipping ...")
             except UnicodeDecodeError:
-                self.logger.warn(f"The file {lFile} appears to be corrupted \n skipping ...")
+                self.logger.warning(f"The file {lFile} appears to be corrupted \n skipping ...")
             except ValueError as ve:
-                self.logger.warn(f"Something was wrong with the formatting of the toml file {lFile}, Error = {ve} \n" 
-                                 "skipping ...")
+                self.logger.warning(f"Something was wrong with the formatting of the toml file {lFile}, Error = {ve} \n" 
+                                    "skipping ...")
             except PermissionError:
-                self.logger.warn(f"Permissions do not allow reading the file {lFile} \n skipping ...")
+                self.logger.warning(f"Permissions do not allow reading the file {lFile} \n skipping ...")
             except NonMatchingURL:
                 #typical behavior no need for a warn
                 self.logger.info(f"Captive Portal {captiveURL} doesnt start with {login.URL} skipping ...")  
-            except Exception as e: 
-                self.logger.error(f"Unexpected error: {str(e)} \n skipping ...")
+            # except Exception as e: 
+            #     self.logger.error(f"Unexpected error: {str(e)} \n skipping ...")
             #next design a function that relegates actions etc. #and one that reads the url and compares it to the 
             #captive portal url
         if len(list(loginfiles)) == 0:
@@ -261,6 +264,8 @@ class Orchestrator():
         """
         filepath = self.modes["default"]
         captiveURL = self._findURL()
+        if isinstance(captiveURL, list):
+            captiveURL = str(captiveURL[0])
         try:
             LoginParser(filepath)
         except OSError:

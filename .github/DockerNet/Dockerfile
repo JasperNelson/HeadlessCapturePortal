@@ -1,8 +1,11 @@
-FROM ubuntu:latest
+FROM python:3.12
+WORKDIR /usr/local/flask-serv
+EXPOSE 5000
 
-RUN apt-get update && apt-get install -y \ 
-    iw \
-    iproute2 \
-    lighttpd
+# copy server files
+COPY . /usr/local/flask-serv/
 
-EXPOSE 80
+# Install flask
+RUN pip install flask
+
+CMD python webknd.py

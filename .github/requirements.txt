@@ -6,3 +6,5 @@ pytest
 pyyaml
 playwright
 pytest-playwright
+flask
+requests

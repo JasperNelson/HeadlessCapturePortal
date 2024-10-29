@@ -13,12 +13,12 @@
     stdout: {
       class: "logging.StreamHandler",
  #     level: "DEBUG",
-      formatter: "simple",
+      formatter: "complex",
       stream: "ext://sys.stdout"
     },
     stderr: {
       class: "logging.StreamHandler",
-      formatter: "simple",
+      formatter: "complex",
       stream: "ext://sys.stderr"
     },
 
@@ -34,7 +34,7 @@
   loggers: {
   },
   root: {
-    level: "WARNING",
+    level: "INFO",
     handlers: [
       stderr,
       logfile

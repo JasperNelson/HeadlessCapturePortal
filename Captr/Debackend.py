@@ -21,3 +21,7 @@ class DebugBackend(backend):
     def Click(self, locator: dict) -> bool:
         print(f"clicked the object located at{locator}")
         return True
+    def PrintPage(self) -> str:
+        print(f"prints page")
+        return True
+        

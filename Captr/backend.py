@@ -27,3 +27,7 @@ class backend(ABC):
     @abstractmethod
     def Click(self, locator: dict) -> bool:
         pass
+    
+    @abstractmethod
+    def PrintPage(self) -> str:
+        pass
