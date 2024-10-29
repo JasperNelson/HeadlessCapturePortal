@@ -10,8 +10,33 @@ jobs:
     - uses: actions/setup-python@v5
       with: 
         python-version: '3.12.2'
-    - name: install Firefox
-      run: sudo apt-get install -y firefox 
+    - name: install necessary packages
+      run: sudo apt update && sudo apt install -y \
+          libatk1.0-0 \
+          libatk-bridge2.0-0 \
+          libcups2 \
+          libdbus-glib-1-2 \
+          libdrm2 \
+          libxcomposite1 \
+          libxdamage1 \
+          libxrandr2 \
+          libgbm1 \
+          libasound2 \
+          libpangocairo-1.0-0 \
+          libpangoft2-1.0-0 \
+          libcairo2 \
+          libcairo-gobject2 \
+          libxi6 \
+          libxtst6 \
+          libnss3 \
+          libxss1 \
+          libx11-xcb1 \
+          libxkbcommon0 \
+          libxshmfence1 \
+          libwayland-client0 \
+          libwayland-cursor0 \
+          libwayland-egl1 \
+          libgtk-3-0
     - name: Build Testing Server
       run: docker buildx build -t dockernet:dockernet -f .github/DockerNet/Dockerfile .
     - name: Run Testing Server
