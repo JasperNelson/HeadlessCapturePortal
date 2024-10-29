@@ -1,10 +1,7 @@
-FROM archlinux:latest
-RUN pacman -Syu --noconfirm \
-    && pacman -S git base-devel --noconfirm \
-    && pacman -Scc --noconfirm
-RUN pacman -S python --noconfirm 
-RUN pacman -S pyenv --noconfirm 
-RUN pacman -S gnome-keyring dbus --noconfirm
+FROM ubuntu:latest
+EXPOSE 80
+EXPOSE 443
+RUN apt install -y firefox gnome-keyring dbus pyenv python
 ENV HOME  /home/python_user
 ENV PYENV_ROOT $HOME/.pyenv
 ENV PATH $PYENV_ROOT/shims:$PYENV_ROOT/bin:$PATH
