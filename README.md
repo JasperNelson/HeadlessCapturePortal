@@ -31,7 +31,9 @@
   - Currently Valid strings:
     - `Debug` Backend used for troubleshooting and testing purposes
     - `f_Playwright` Backend which utilizes firefox and playwright
-    - `
+    - `f_v_Playwright` Visual Backend for firefox and playwright
+    - `c_Playwright` Backend for Chrome
+    - `c_v_Playwright` Visual Backend for Chrome
 
 ## Actions Configuration
 
@@ -60,8 +62,16 @@
 
 - **Text Input**:
   - Action: `text`
-  - Description: Enters text into a field. If `value` is not specified, the user will be prompted.
-  - Name: The name attribute of the input field.
+  - Description: Enters text into a field. If `value` is not specified, the user will be prompted. 
+  - **Identifiers:** (you can only have one of these)
+    - ID: Supports regular expressions. Unique identifier.
+      - Example: `id="example"`
+    - Name: Targets elements by their name attribute on the webpage.
+      - Example: `name="examplename"`
+    - Type: Targets elements by their type attribute.
+      - Example: `type="checkbox"`
+    - xpath: Targets elements by their xpath attribute.
+      - Example: `xpath=\foo`
   - **"Enterables":** 
     - Value: The text to enter. Optional.
       - Example: `name="name", value="examplestringEGUserName"`
@@ -82,7 +92,7 @@
 
 - **Move Action**:
   - Action: `move`
-  - Description: Navigates to a new page specified by href or ID.
+  - Description: Navigates to a new page specified by href, ID.
   - Examples:
     - `href="href_url"` (navigates to a page by URL)
     - `id="ID"` (navigates to a page by the element ID)
@@ -113,16 +123,16 @@
 4. [x] Define a module that verifies that a captive portal actually exists on the network and that it meets the specifications defined in the `Login` files.
 5. [x] ~~Define an extensible configuration file format~~
 6. [x] Finish "Quick" frontend (all the commands that cause an immediate action)
-7. [ ] Setup the Auto login to automatically login to a captive portal from a matching given url
-8. [ ] Setup Unit Tests 
+7. [x] Setup the Auto login to automatically login to a captive portal from a matching given url
+8. [x] Setup Unit Tests 
 9. [x] Develop Modular and Actionable Network Portion of Backend using requests that will take commands from the frontend. HOWEVER ensure that we are creating a good api that 
 can be expanded on by additional installable packages/modules. (i.e [Selenium] or [Custom backends]) 
 10. [x] Develop Debug Backend
 11. [x] Setup the yes command to bypass questions
 12. [x] Setup verbose command to automatically enable verbose logging
 13. [x] Setup Layout command to automatically return the layout of a URL. 
-14. [-] Setup Default command to login using a single given login toml file
-15. [-] Setup The Auto command to login using a directory of files contained in the config or manually specified
+14. [x] Setup Default command to login using a single given login toml file
+15. [x] Setup The Auto command to login using a directory of files contained in the config or manually specified
 16. [x] Setup the URL command to return the captive portal
 1. [x] Develop the Playwright Backend
 ##### FOR 2.0
