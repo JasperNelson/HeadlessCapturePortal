@@ -23,5 +23,5 @@ class DebugBackend(backend):
         return True
     def PrintPage(self) -> str:
         print(f"prints page")
-        return True
+        return "Foo"
         
