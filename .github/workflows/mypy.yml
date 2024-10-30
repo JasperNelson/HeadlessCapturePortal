@@ -13,7 +13,8 @@ jobs:
     - name: install requirements
       run: pip install -r requirements.txt
     - name: install types
-      run: mypy --install-types
-    - name: mypy 
+      run: mypy ./Captr/ --install-types --non-interactive
+    - name: mypy test
       run: mypy ./Captr/
+
       
