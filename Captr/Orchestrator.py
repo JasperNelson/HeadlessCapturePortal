@@ -222,8 +222,8 @@ class Orchestrator():
                     self.Dispatch(login, captiveURL)
                 else:
                     response = input(f"matching login file found do you want to try to login with {lFile}? \n"
-                                     "Y/n")
-                    if response.lower() == "y":
+                                     "Y/n\n")
+                    if "y" in response.lower():
                         self.Dispatch(login, captiveURL)
                     else: 
                         self.logger.info("Rejection Acknowledged, skipping ...")
