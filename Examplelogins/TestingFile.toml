@@ -1,7 +1,7 @@
 # Used to login to the testing server with flask
 [NETWORK]
 URL="http://127.0.0.1:50"
-Backend="f_v_Playwright"
+Backend="f_Playwright"
 
 [[ACTION]]
 action="text"

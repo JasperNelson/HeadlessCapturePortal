@@ -13,7 +13,11 @@ jobs:
     - name: Build Testing Server
       run: docker buildx build -t dockernet:dockernet -f .github/DockerNet/Dockerfile .
     - name: Run Testing Server
-      run: cd .github/DockerNet && docker run -d -p 5000:5000 --name dockernet dockernet:dockernet && cd ../..
+      run: cd .github/DockerNet && docker run -d --network="host" -p 5000:5000 --name dockernet dockernet:dockernet
+    - name: where are we
+      run: ls -la
+    - name: Back Out
+      run: cd ../..
     - name: install requirements
       run: pip install -r requirements.txt
     - name: update apt
@@ -22,6 +26,10 @@ jobs:
       run: playwright install-deps
     - name: install playwright
       run: playwright install
+    - name: wait
+      run: sleep 5
+    - name: debug
+      run: docker logs dockernet
     - name: testing server reachable
       run: curl http://127.0.0.1:5000
     - name: pytest run
