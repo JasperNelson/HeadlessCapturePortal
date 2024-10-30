@@ -1,6 +1,6 @@
 
 [NETWORK]
-URL="http://127.0.0.1:5000/"
+URL="http://127.0.0.1:500"
 Backend="f_v_Playwright"
 
 [[ACTION]]

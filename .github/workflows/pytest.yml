@@ -22,6 +22,8 @@ jobs:
       run: playwright install-deps
     - name: install playwright
       run: playwright install
+    - name: testing server reachable
+      run: curl http://127.0.0.1:5000
     - name: pytest run
       run: pytest -vv
       
